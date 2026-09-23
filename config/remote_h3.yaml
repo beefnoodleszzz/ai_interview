@@ -1,0 +1,15 @@
+schema_version: ai-interview-remote-h3-v1
+transport: ssh
+remote:
+  host_env: AI_INTERVIEW_H3_HOST
+  user_env: AI_INTERVIEW_H3_USER
+  port_env: AI_INTERVIEW_H3_SSH_PORT
+  command_env: AUTODL_COMMAND
+  dotenv_file: .env.local
+  root: /root/autodl-tmp/ai_interview
+comfyui:
+  endpoint: http://127.0.0.1:8188
+backend:
+  type: minimax_h3
+worker_entrypoint: worker.py
+worker_python: /root/miniconda3/bin/python

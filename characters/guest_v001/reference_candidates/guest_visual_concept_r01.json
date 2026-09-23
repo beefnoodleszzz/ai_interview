@@ -1,0 +1,16 @@
+{
+  "schema_version": "ai-interview-visual-candidate-v1",
+  "asset_id": "guest_visual_concept_r01",
+  "entity_id": "guest_v001",
+  "revision": 1,
+  "review_status": "PENDING_DIRECTOR_REVIEW",
+  "approved": false,
+  "prompt_preparation": {
+    "skill": "gpt-image-2-style-library",
+    "template": "Realistic Photography",
+    "template_id": "realistic-photography",
+    "example_case": 377
+  },
+  "sha256": "bddf07bd742f7afab33817aa020bd6e663297baac50cbbef37170cdc339dc81e",
+  "notes": "portrait; 2:3; original restrained extraterrestrial; readable human-like mouth; reference candidate only"
+}

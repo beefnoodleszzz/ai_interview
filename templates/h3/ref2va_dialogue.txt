@@ -1,0 +1,22 @@
+subject_definitions:
+<Subject 1> is the speaking character defined by <Picture 1>; preserve identity, hair, age, outfit, and current studio lighting.
+<Subject 2> is the fixed interview studio in <Picture 2>; preserve the table, microphone, practical lights, seating direction, and camera axis.
+<Audio 1> is the exact dialogue performance for <Subject 1> (S1); copy its spoken timing, pauses, and words.
+
+summary:
+[reference generation + audio reuse] A realistic interview close-up uses <Picture 1> and <Picture 2> for identity and space while <Audio 1> provides the exact dialogue performance.
+
+retention_analysis:
+<Subject 1> (appears in [Shot 1]): fully_preserved - identity, outfit, lighting, and restrained interview performance are retained.
+<Subject 2> (appears in [Shot 1]): fully_preserved - studio geometry, microphone, lighting, and screen direction are retained.
+<Audio 1>: fully_copy - the supplied dialogue signal is reused as the complete spoken performance for this shot.
+
+detailed_description:
+The target video uses realistic live-action podcast cinematography with stable warm studio lighting.
+[Shot 1] A static medium close-up frames <Subject 1> seated inside <Subject 2>, angled toward the off-camera conversation partner rather than the viewer. <Subject 1> (S1) listens briefly, makes one restrained reaction, and speaks the exact supplied line from <Audio 1>: <d>[Chinese] 在这里替换为最终台词。</d> Lip, jaw, breath, head, and eye motion follow <Audio 1>. Gestures remain small. After the final word, the mouth closes and the character holds the reaction without additional speech. No narration.
+
+overall_soundscape:
+Quiet podcast-studio room tone with a very low ventilation hum and subtle clothing movement.
+
+non_diegetic_music:
+N/A

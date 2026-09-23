@@ -1,0 +1,37 @@
+schema_version: ai-interview-pipeline-v1
+project:
+  fps: 24
+  aspect_ratio: "9:16"
+  final_resolution: [1080, 1920]
+local:
+  ffmpeg: ffmpeg
+  ffprobe: ffprobe
+remote_h3:
+  protocol: ai-interview-h3-remote-v1
+  root: /root/autodl-tmp/ai_interview
+  comfyui_endpoint: http://127.0.0.1:8188
+  host_env: AI_INTERVIEW_H3_HOST
+  user_env: AI_INTERVIEW_H3_USER
+  port_env: AI_INTERVIEW_H3_SSH_PORT
+  command_env: AUTODL_COMMAND
+budgets:
+  max_attempts_per_shot: 4
+  max_gpu_minutes_per_shot: 15
+  max_gpu_minutes_per_episode: 300
+h3:
+  min_duration_sec: 4
+  max_duration_sec: 15
+  max_images: 9
+  max_videos: 3
+  max_audios: 3
+  max_mixed_assets: 12
+  max_reference_video_seconds: 15
+  max_reference_audio_seconds: 15
+voice:
+  runtime: remote_autodl
+  primary_model: IndexTTS-2.5
+  voice_design_model: Qwen3-TTS-VoiceDesign
+  benchmark_models: [Fun-CosyVoice-3, Qwen3-TTS-Base]
+  asr_candidates: [Whisper, FunASR, WhisperX]
+  candidates: 3
+  sample_rate: 48000

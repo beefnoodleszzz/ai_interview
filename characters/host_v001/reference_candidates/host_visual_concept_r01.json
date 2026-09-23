@@ -1,0 +1,16 @@
+{
+  "schema_version": "ai-interview-visual-candidate-v1",
+  "asset_id": "host_visual_concept_r01",
+  "entity_id": "host_v001",
+  "revision": 1,
+  "review_status": "PENDING_DIRECTOR_REVIEW",
+  "approved": false,
+  "prompt_preparation": {
+    "skill": "gpt-image-2-style-library",
+    "template": "Realistic Photography",
+    "template_id": "realistic-photography",
+    "example_case": 377
+  },
+  "sha256": "7576666c8d2e4af0df71a51b30c346d051c21505ec70381c1b94054d929cc386",
+  "notes": "portrait; 2:3; restrained skeptical expression; human host; reference candidate only"
+}

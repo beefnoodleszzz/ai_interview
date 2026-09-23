@@ -1,0 +1,7 @@
+How the reference pictures align with the target video — Picture 1 (from Shot 1) aligns with the 0.00-second mark of the target video; Picture 2 (from Shot 1) aligns with the 4.25-second mark of the target video.
+
+integrated_multimodal_description: [Shot 1] Live-action, realistic podcast cinematography, the silent character begins in the exact identity, pose, framing, studio geometry, microphone position, and lighting established by Picture 1. The camera holds a static medium close-up. The character keeps their lips closed, raises the eyebrows slightly, suppresses a small smile, and shifts their gaze toward the off-camera speaker. Motion remains restrained and continuous until the expression, pose, and composition settle into Picture 2 at the end of the shot. No dialogue, no narration, and no mouth movement suggesting speech.
+
+overall_soundscape: Quiet podcast-studio room tone with a low ventilation hum and faint clothing movement. No speech.
+
+non_diegetic_music: N/A

@@ -1,0 +1,214 @@
+schema_version: ai-interview-episode-v1
+pipeline_version: 0.1.0
+episode_id: EP0001_golden_clip
+title: 黄金测试片段
+format: '9:16'
+fps: 24
+target_duration: 15.8
+status: PLANNED
+retry_policy:
+  max_attempts_per_shot: 4
+  max_gpu_minutes_per_shot: 15
+  max_gpu_minutes_per_episode: 300
+characters:
+  host:
+    character_id: host_v001
+    voice_id: host_voice_v001
+    voice_reference: 02_refs/voices/host_voice_v001_r01.wav
+    voice_design_revision: 2
+    voice_reference_frozen: false
+    voice_design:
+      description: Original contemporary Mandarin interview host voice, adult feminine
+        presentation, warm low-mid register, lightly textured and close-miked, dry
+        skeptical humor, subtle breath and natural conversational pauses, never announcer-like
+        or exaggerated.
+      sample_text: 欢迎来到今天的访谈。先别急着解释，我想确认一下，你刚才说的计划，真的已经开始执行了吗？如果只是准备了很久，那和已经做完，中间还是差了不少步骤。
+      language: Chinese
+  guest:
+    character_id: guest_v001
+    voice_id: guest_voice_v001
+    voice_reference: 02_refs/voices/guest_voice_v001_r01.wav
+    voice_design_revision: 1
+    voice_reference_frozen: false
+    voice_design:
+      description: Original Mandarin guest voice for a fictional extraterrestrial
+        character, adult masculine presentation, calm low-mid register, dry deadpan
+        delivery, steady pacing, slight grain, restrained emotion, precise consonants,
+        no theatrical monster effect.
+      sample_text: 我们本来准备毁灭地球。后来负责这个项目的领导开始刷你们的短视频，每天都要看很久。会议因此一再延期，计划也没人再提起，最后大家决定先观察一段时间。
+      language: Chinese
+beats:
+- id: B01
+  speaker: guest
+  text: 我们本来准备毁灭地球。
+  emotion: deadpan
+  pause_after: 0.45
+- id: B02
+  speaker: host
+  text: 本来？
+  emotion: suspicious_amused
+  pause_after: 0.4
+- id: B03
+  speaker: guest
+  text: 后来领导开始刷你们短视频了。
+  emotion: deadpan
+  pause_after: 0.35
+- id: B04
+  speaker: host
+  text: 所以……是短视频救了地球？
+  emotion: dry
+  pause_after: 0.4
+shots:
+- id: S001
+  camera: guest_closeup
+  speaker: guest
+  beat_ids:
+  - B01
+  edit_duration_sec: 3.5
+  generation_duration_sec: 5.1666666667
+  h3_mode: ref2va
+  status: PLANNED
+  candidate_count: 3
+  prompt: 03_h3_prompts/S001.txt
+  references:
+    images:
+    - 02_refs/guest_identity.png
+    - 02_refs/studio_guest.png
+    videos: []
+    audios:
+    - 01_audio/master/S001_guest.wav
+  audio_intent: exact guest dialogue plus quiet studio ambience
+  preserve:
+  - guest identity
+  - studio geometry
+  - look direction
+  avoid:
+  - extra speech
+  - exaggerated gestures
+  - direct eye contact with viewer
+- id: S002
+  camera: host_reaction
+  speaker: none
+  beat_ids: []
+  edit_duration_sec: 0.8
+  generation_duration_sec: 5.1666666667
+  h3_mode: fl2va
+  status: PLANNED
+  candidate_count: 3
+  prompt: 03_h3_prompts/S002.txt
+  references:
+    first_frame: 02_refs/host_reaction_start.png
+    last_frame: 02_refs/host_reaction_end.png
+    images: []
+    videos: []
+    audios: []
+  audio_intent: quiet studio ambience only; no speech
+  preserve:
+  - host identity
+  - closed lips
+  - studio geometry
+  avoid:
+  - speech
+  - mouth movement
+  - large gesture
+- id: S003
+  camera: host_closeup
+  speaker: host
+  beat_ids:
+  - B02
+  edit_duration_sec: 1.5
+  generation_duration_sec: 5.1666666667
+  h3_mode: ref2va
+  status: PLANNED
+  candidate_count: 3
+  prompt: 03_h3_prompts/S003.txt
+  references:
+    images:
+    - 02_refs/host_identity.png
+    - 02_refs/studio_host.png
+    videos: []
+    audios:
+    - 01_audio/master/S003_host.wav
+  audio_intent: exact host dialogue plus quiet studio ambience
+  preserve:
+  - host identity
+  - studio geometry
+  - look direction
+  avoid:
+  - extra speech
+  - presenter delivery
+- id: S004
+  camera: guest_closeup
+  speaker: guest
+  beat_ids:
+  - B03
+  edit_duration_sec: 5.4
+  generation_duration_sec: 5.875
+  h3_mode: ref2va
+  status: PLANNED
+  candidate_count: 3
+  prompt: 03_h3_prompts/S004.txt
+  references:
+    images:
+    - 02_refs/guest_identity.png
+    - 02_refs/studio_guest.png
+    videos: []
+    audios:
+    - 01_audio/master/S004_guest.wav
+  audio_intent: exact guest dialogue plus quiet studio ambience
+  preserve:
+  - guest identity
+  - studio geometry
+  - restrained deadpan acting
+  avoid:
+  - extra speech
+  - exaggerated gesture
+- id: S005
+  camera: host_closeup
+  speaker: host
+  beat_ids:
+  - B04
+  edit_duration_sec: 4.6
+  generation_duration_sec: 5.1666666667
+  h3_mode: ref2va
+  status: PLANNED
+  candidate_count: 3
+  prompt: 03_h3_prompts/S005.txt
+  references:
+    images:
+    - 02_refs/host_identity.png
+    - 02_refs/studio_host.png
+    videos: []
+    audios:
+    - 01_audio/master/S005_host.wav
+  audio_intent: exact host dialogue plus quiet studio ambience
+  preserve:
+  - host identity
+  - studio geometry
+  - suppressed amusement
+  avoid:
+  - extra speech
+  - broad smile
+  - presenter delivery
+voice_design_jobs:
+  EP0001_golden_clip_host_voice_v001_design_r01:
+    status: FAILED
+    gpu_minutes: 0.0
+    updated_at: '2026-09-23T02:31:57.731393+00:00'
+    error: 'FlashAttention2 has been toggled on, but it cannot be used due to the
+      following error: the package flash_attn seems to be not installed. Please refer
+      to the documentation of https://huggingface.co/docs/transformers/perf_infer_gpu_one#flashattention-2
+      to install Flash Attention 2.'
+    character_id: host
+  EP0001_golden_clip_host_voice_v001_design_r02:
+    status: COMPLETE
+    gpu_minutes: 0.625
+    updated_at: '2026-09-23T02:35:02.098384+00:00'
+    error: null
+    character_id: host
+  EP0001_golden_clip_guest_voice_v001_design_r01:
+    status: COMPLETE
+    gpu_minutes: 0.671
+    updated_at: '2026-09-23T02:41:35.518944+00:00'
+    error: null
+    character_id: guest

@@ -1,0 +1,16 @@
+{
+  "schema_version": "ai-interview-visual-candidate-v1",
+  "asset_id": "studio_wide_concept_r01",
+  "entity_id": "studio_v001",
+  "revision": 1,
+  "review_status": "PENDING_DIRECTOR_REVIEW",
+  "approved": false,
+  "prompt_preparation": {
+    "skill": "gpt-image-2-style-library",
+    "template": "Realistic Photography",
+    "template_id": "realistic-photography",
+    "example_case": 377
+  },
+  "sha256": "d41fbfba56c1d2b10119784013bad5e8ea67bfbd4b5bae24ded54dd08f28d185",
+  "notes": "empty podcast interior; 16:9; two chairs and mic positions; reference candidate only"
+}

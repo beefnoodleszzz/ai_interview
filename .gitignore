@@ -1,6 +1,37 @@
+.DS_Store
+graphify-out/
+.env
+.env.local
+.venv/
+__pycache__/
+*.py[cod]
+.coverage
+logs/*
+!logs/.gitkeep
+episodes/*/01_audio/raw/
+episodes/*/01_audio/master/
+episodes/*/01_audio/mix/
+episodes/*/04_shots_raw/
+episodes/*/05_shots_selected/
+episodes/*/06_lipsync/
+episodes/*/07_edit/
+episodes/*/08_upscale/
+episodes/*/09_final/
+episodes/*/remote_jobs/
+episodes/*/remote_results/
+episodes/*/voice_jobs/
+episodes/*/voice_design_jobs/
+episodes/*/voice_design_results/
+*.wav
+*.mp3
+*.mp4
+*.mov
+*.mkv
+*.safetensors
+*.ckpt
+*.pt
+*.pth
 
-# Beads / Dolt files (added by bd init)
-.dolt/
-*.db
-.beads-credential-key
-.beads/proxieddb/
+# Local-generated visual references are candidates and must not be committed as media.
+characters/*/reference_candidates/*.png
+sets/*/reference_candidates/*.png
