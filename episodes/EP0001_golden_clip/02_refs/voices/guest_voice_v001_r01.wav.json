@@ -1,0 +1,17 @@
+{
+  "schema_version": "ai-interview-voice-design-v1",
+  "job_id": "EP0001_golden_clip_guest_voice_v001_design_r01",
+  "character_id": "guest",
+  "voice_id": "guest_voice_v001",
+  "candidate_id": "EP0001_golden_clip_guest_voice_v001_design_r01_candidate_01",
+  "source": "voice_design_results/EP0001_golden_clip_guest_voice_v001_design_r01/guest_voice_v001_candidate_01.wav",
+  "source_sha256": "795b4c0d84285ad77ebdae5da6626260f1374b53fad06d02bc60e2acaf8d86ca",
+  "source_duration_sec": 14.48,
+  "selected_by": "项目所有者",
+  "selected_at": "2026-09-23T03:08:43.145370+00:00",
+  "evidence": "owner_listened_and_selected; ASR is not voice-quality approval",
+  "output_sha256": "e0e53ded3722366ae4f786ee94f19ad0cc4188421de1ebc0de64d8ad63c8b294",
+  "sample_rate": 48000,
+  "channels": 1,
+  "duration_sec": 14.48
+}
