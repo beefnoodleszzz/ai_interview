@@ -17,6 +17,7 @@ AutoDL 实例上的 H3、Qwen3-TTS、IndexTTS、LatentSync 和 SeedVR2 主环境
 | --- | --- | --- |
 | IndexTTS-2.5 | `apps/index-tts/.venv` | GPU 推理 PASS；生成 4.946 秒 22.05 kHz WAV；辅助模型已落盘 |
 | Qwen3-TTS | `envs/qwen3-tts` | VoiceDesign GPU 推理 PASS；生成 4.32 秒 24 kHz WAV |
+| Whisper ASR | `envs/asr` | 独立 venv 安装 PASS；复用 LatentSync tiny checkpoint；尚未做项目级转写 job |
 | LatentSync | `envs/latentsync` | 离线依赖导入成功；该次导入检查未挂载 GPU，尚未做真实推理 Smoke |
 | H3 / ComfyUI | `/root/miniconda3` | 离线依赖检查后，已在 RTX 5090 实例启动并通过 ComfyUI/H3 doctor；尚未完成真实 Ref2VA 作业 |
 
@@ -36,6 +37,13 @@ ComfyUI API 已启动并通过 H3 doctor。
 
 ComfyUI 的 H3 模型和 SeedVR2 模型通过软链接指向上述运行树；IndexTTS 的
 `apps/index-tts/checkpoints` 也已软链接到 `models/voice/IndexTTS-2.5`。
+
+项目 Worker/workflow 由本地 `scripts/deploy_remote_worker.py` 以 SHA-256 包部署，
+替换前版本备份在 `worker/backups/`。本轮最新 `remote-doctor` PASS；
+`ComfyUI` 保持绑定 `127.0.0.1:8188`。另行探测确认 LatentSync
+`scripts/inference.py`、隔离环境、SeedVR2 节点存在。磁盘 `/dev/md0` 当前仅
+约 17 GiB 可用（86% 使用），本轮 GPU 状态读取为 RTX 5090、508 MiB/32607 MiB、
+0% 利用率；所有进一步推理须先重查空间与预算。
 
 ## 磁盘与清理
 
