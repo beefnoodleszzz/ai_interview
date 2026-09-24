@@ -1,0 +1,11 @@
+{
+  "status": "APPROVED_REFERENCE",
+  "approved_by": "project owner in conversation",
+  "approved_on": "2026-09-24",
+  "role": "Studio wide r01",
+  "source_candidate": "../../../sets/studio_v001/reference_candidates/studio_wide_concept_r01.png",
+  "path": "studio_wide.png",
+  "sha256": "d41fbfba56c1d2b10119784013bad5e8ea67bfbd4b5bae24ded54dd08f28d185",
+  "source_sha256": "d41fbfba56c1d2b10119784013bad5e8ea67bfbd4b5bae24ded54dd08f28d185",
+  "review_record": "../VISUAL_REVIEW.md"
+}

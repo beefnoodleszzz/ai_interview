@@ -1,0 +1,16 @@
+{
+  "schema_version": "ai-interview-voice-v1",
+  "job_id": "EP0001_golden_clip_voice_r02",
+  "line_id": "B02",
+  "candidate_id": "EP0001_golden_clip_voice_r02_B02_candidate_01",
+  "filename": "B02_candidate_01.wav",
+  "sha256": "2da789ef9fa618243cba5d76ad8a1bec4e96440b28fe646e287bbe9d3ac9f472",
+  "text": "本来？",
+  "asr_text": "本來",
+  "voice_id": "host_voice_v001",
+  "emotion": "suspicious_amused",
+  "generation_seconds": 2.682,
+  "duration_sec": 0.708209,
+  "sample_rate": 22050,
+  "channels": 1
+}

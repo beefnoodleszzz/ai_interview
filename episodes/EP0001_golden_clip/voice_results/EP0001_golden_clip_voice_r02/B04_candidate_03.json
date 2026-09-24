@@ -1,0 +1,16 @@
+{
+  "schema_version": "ai-interview-voice-v1",
+  "job_id": "EP0001_golden_clip_voice_r02",
+  "line_id": "B04",
+  "candidate_id": "EP0001_golden_clip_voice_r02_B04_candidate_03",
+  "filename": "B04_candidate_03.wav",
+  "sha256": "f80c6d16be7d8b41d6249d1f4485bac6b37b6f23c89d51912fe8b30ca5b2e295",
+  "text": "所以……是短视频救了地球？",
+  "asr_text": "所以是短视频就了地球",
+  "voice_id": "host_voice_v001",
+  "emotion": "dry",
+  "generation_seconds": 3.467,
+  "duration_sec": 4.585941,
+  "sample_rate": 22050,
+  "channels": 1
+}

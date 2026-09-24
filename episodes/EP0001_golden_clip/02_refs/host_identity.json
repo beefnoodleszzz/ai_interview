@@ -1,0 +1,13 @@
+{
+  "status": "APPROVED_REFERENCE",
+  "approved_by": "项目所有者",
+  "approved_on": "2026-09-23",
+  "source_candidate": "../../../../characters/host_v001/reference_candidates/host_visual_concept_r04.png",
+  "path": "host_identity.png",
+  "sha256": "bf0dfafa410545bee84702fdbe4c5b63ca2b9c46b0a86f9fbef6e640f7e7c770",
+  "dimensions": [
+    1122,
+    1402
+  ],
+  "notes": "项目所有者确认 Host r04；本图作为 EP0001 主持人身份参考。AI 生成虚构主持人形象。"
+}

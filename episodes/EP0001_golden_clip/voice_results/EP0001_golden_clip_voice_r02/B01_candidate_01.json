@@ -1,0 +1,16 @@
+{
+  "schema_version": "ai-interview-voice-v1",
+  "job_id": "EP0001_golden_clip_voice_r02",
+  "line_id": "B01",
+  "candidate_id": "EP0001_golden_clip_voice_r02_B01_candidate_01",
+  "filename": "B01_candidate_01.wav",
+  "sha256": "997181e968d57a729aa0945345efebc8a4fc6d1f5b6b088208d9db8db244446e",
+  "text": "我们本来准备毁灭地球。",
+  "asr_text": "我们本来准备毁灭地球",
+  "voice_id": "guest_voice_v001",
+  "emotion": "deadpan",
+  "generation_seconds": 5.584,
+  "duration_sec": 2.194286,
+  "sample_rate": 22050,
+  "channels": 1
+}

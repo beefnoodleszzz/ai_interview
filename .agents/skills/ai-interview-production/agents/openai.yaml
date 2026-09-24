@@ -1,0 +1,3 @@
+interface:
+  display_name: "AI 访谈出片"
+  short_description: "从台本到 AutoDL 渲染、剪辑和验收"

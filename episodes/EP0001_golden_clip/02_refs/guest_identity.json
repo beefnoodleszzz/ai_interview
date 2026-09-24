@@ -1,0 +1,10 @@
+{
+  "status": "APPROVED_BY_USER",
+  "asset_id": "guest_identity",
+  "source": "../../../characters/guest_v001/reference_candidates/guest_visual_concept_r01.png",
+  "path": "guest_identity.png",
+  "sha256": "bddf07bd742f7afab33817aa020bd6e663297baac50cbbef37170cdc339dc81e",
+  "approved_by": "project owner in conversation",
+  "approved_on": "2026-09-23",
+  "scope": "guest identity portrait only; studio close-up remains pending"
+}

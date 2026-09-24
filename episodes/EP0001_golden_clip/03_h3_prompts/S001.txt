@@ -1,0 +1,22 @@
+subject_definitions:
+<Subject 1> is the fictional extraterrestrial guest defined by <Picture 1>: an adult masculine figure with olive-gray natural skin, a human-readable mouth, black over-ear headphones, and a dark slate shirt. His face and restrained demeanor remain consistent.
+<Subject 2> is the fixed two-person interview studio defined by <Picture 2>: charcoal acoustic panels, warm walnut slats and table, low amber practical light, and a black boom microphone. The guest sits on camera-left and looks camera-right toward the unseen host.
+<Audio 1> is the selected 48 kHz Mandarin Dialogue Master for <Subject 1> (S1), carrying the exact words, breath, and pause of this shot.
+
+summary:
+[reference generation + audio reuse] A single realistic guest close-up preserves <Subject 1> and <Subject 2> while <Audio 1> controls the exact spoken performance. The guest discloses an absurd plan as if reporting an ordinary fact.
+
+retention_analysis:
+<Subject 1> (appears in [Shot 1]): fully_preserved - keep the same olive-gray facial identity, readable humanlike lips, headphones, shirt, and controlled expression.
+<Subject 2> (appears in [Shot 1]): fully_preserved - keep the walnut and charcoal studio, warm light direction, microphone placement, and camera axis.
+<Audio 1>: fully_copy - use the supplied dialogue signal and pauses as the spoken timing authority; add only unobtrusive native studio ambience.
+
+detailed_description:
+The target is a 5.17-second realistic live-action podcast close-up in a vertical frame. Lighting is warm, soft, and stable, with natural skin texture and no visual effects.
+[Shot 1] A static eye-level chest-up view places <Subject 1> slightly left of center inside <Subject 2>. A black boom microphone sits at the lower-right edge without hiding his lips; walnut slats and dark acoustic panels remain fixed behind him. He looks camera-right toward the host rather than into the lens. For a brief beat he takes a small natural breath, then <Subject 1> (S1) speaks with dry, matter-of-fact restraint in exact synchronization with <Audio 1>: <d>[Chinese] 我们本来准备毁灭地球。</d> The lips, jaw, and breath follow the supplied consonants and vowels; the word “本来” has a quiet implication but no theatrical emphasis. His shoulders remain still, his eyes shift only slightly toward the host, and his hands stay out of frame. After the final syllable his lips close and he holds the host's gaze through the remaining time, leaving room for a reaction cut. No additional person, gestures, visible text, unexpected speech, or narration.
+
+overall_soundscape:
+Quiet enclosed podcast-studio room tone with a faint low ventilation bed. No audience reaction, no narration, or other speech; native ambience stays below the supplied voice.
+
+non_diegetic_music:
+N/A

@@ -1,0 +1,100 @@
+{
+  "schema_version": "ai-interview-voice-v1",
+  "job_id": "EP0001_golden_clip_voice_r02",
+  "episode_id": "EP0001_golden_clip",
+  "status": "COMPLETE",
+  "gpu_minutes": 1.867,
+  "gpu_minutes_by_shot": {
+    "S001": 0.191,
+    "S003": 0.118,
+    "S004": 0.16,
+    "S005": 0.181
+  },
+  "completed_at": "2026-09-23T17:09:06.500351+00:00",
+  "candidates": [
+    {
+      "line_id": "B01",
+      "candidate_id": "EP0001_golden_clip_voice_r02_B01_candidate_01",
+      "filename": "B01_candidate_01.wav",
+      "metadata_file": "B01_candidate_01.json",
+      "sha256": "997181e968d57a729aa0945345efebc8a4fc6d1f5b6b088208d9db8db244446e"
+    },
+    {
+      "line_id": "B01",
+      "candidate_id": "EP0001_golden_clip_voice_r02_B01_candidate_02",
+      "filename": "B01_candidate_02.wav",
+      "metadata_file": "B01_candidate_02.json",
+      "sha256": "a97266cd509c1b8f00b8d1b00632b5e98188f38c24556c2a9ac4f4a2d9722e3d"
+    },
+    {
+      "line_id": "B01",
+      "candidate_id": "EP0001_golden_clip_voice_r02_B01_candidate_03",
+      "filename": "B01_candidate_03.wav",
+      "metadata_file": "B01_candidate_03.json",
+      "sha256": "5592fa03c43e0b6b9e6b7c2d91b0df35afaefc1230303e8e7df4eae254dfd6ee"
+    },
+    {
+      "line_id": "B02",
+      "candidate_id": "EP0001_golden_clip_voice_r02_B02_candidate_01",
+      "filename": "B02_candidate_01.wav",
+      "metadata_file": "B02_candidate_01.json",
+      "sha256": "2da789ef9fa618243cba5d76ad8a1bec4e96440b28fe646e287bbe9d3ac9f472"
+    },
+    {
+      "line_id": "B02",
+      "candidate_id": "EP0001_golden_clip_voice_r02_B02_candidate_02",
+      "filename": "B02_candidate_02.wav",
+      "metadata_file": "B02_candidate_02.json",
+      "sha256": "b210703db73c12effd7f9416841e641b9def8f92d722b903aaadfdfd63cd9420"
+    },
+    {
+      "line_id": "B02",
+      "candidate_id": "EP0001_golden_clip_voice_r02_B02_candidate_03",
+      "filename": "B02_candidate_03.wav",
+      "metadata_file": "B02_candidate_03.json",
+      "sha256": "b40c0584e2c0d58942fb5c464a6732a890997f5e6a04d448e392d4b42717f896"
+    },
+    {
+      "line_id": "B03",
+      "candidate_id": "EP0001_golden_clip_voice_r02_B03_candidate_01",
+      "filename": "B03_candidate_01.wav",
+      "metadata_file": "B03_candidate_01.json",
+      "sha256": "cb18df715638383918d0113448d1b5497a3e01731545c88c43eb8e07fff9621f"
+    },
+    {
+      "line_id": "B03",
+      "candidate_id": "EP0001_golden_clip_voice_r02_B03_candidate_02",
+      "filename": "B03_candidate_02.wav",
+      "metadata_file": "B03_candidate_02.json",
+      "sha256": "2a2c1484d76e2bc6394600cd10d8d5091b6ae9d27556ea0ef7361137be7aa266"
+    },
+    {
+      "line_id": "B03",
+      "candidate_id": "EP0001_golden_clip_voice_r02_B03_candidate_03",
+      "filename": "B03_candidate_03.wav",
+      "metadata_file": "B03_candidate_03.json",
+      "sha256": "5cdb481d323b3ca00d7197657085a3eafed5e590e4443c9bd6565202be5a9aa1"
+    },
+    {
+      "line_id": "B04",
+      "candidate_id": "EP0001_golden_clip_voice_r02_B04_candidate_01",
+      "filename": "B04_candidate_01.wav",
+      "metadata_file": "B04_candidate_01.json",
+      "sha256": "3dfa87e9d14826168e3f4435e745e1b37b5b350bd6f14fbca073ab3c1c3d66b7"
+    },
+    {
+      "line_id": "B04",
+      "candidate_id": "EP0001_golden_clip_voice_r02_B04_candidate_02",
+      "filename": "B04_candidate_02.wav",
+      "metadata_file": "B04_candidate_02.json",
+      "sha256": "5da23eb46386b34a41782837fd939d3aeda43028dd1066e8cb2a020df21145c9"
+    },
+    {
+      "line_id": "B04",
+      "candidate_id": "EP0001_golden_clip_voice_r02_B04_candidate_03",
+      "filename": "B04_candidate_03.wav",
+      "metadata_file": "B04_candidate_03.json",
+      "sha256": "f80c6d16be7d8b41d6249d1f4485bac6b37b6f23c89d51912fe8b30ca5b2e295"
+    }
+  ]
+}

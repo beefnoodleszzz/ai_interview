@@ -1,0 +1,21 @@
+{
+  "status": "APPROVED_BY_PROJECT_OWNER",
+  "role": "S002 last_frame candidate; readable restrained reaction",
+  "revision": 4,
+  "path": "host_reaction_end_r04.png",
+  "sha256": "49469f3466dbc47a46c107411c0fda4ce039ffccf80691f66d6ae3ffd7d946cc",
+  "dimensions": [
+    941,
+    1672
+  ],
+  "source_host_identity": "../host_identity.png",
+  "source_studio": "../../../../sets/studio_v001/reference_candidates/studio_wide_concept_r01.png",
+  "source_host_reaction_start": "host_reaction_start_r04.png",
+  "generated_with": "built-in image_gen",
+  "style_template": "Realistic Photography (case 377)",
+  "review_notes": "Independent generation to make the reaction legible: clear asymmetrical raised brow and closed-lip smirk; verify it still matches the approved Host face/hair and start r04 crop.",
+  "prompt": "Use case: photorealistic-natural\nAsset type: S002 reaction shot ending keyframe for a fictional interview host\nUse reference image 1 to keep the exact same woman's face, features, long dark center-parted wavy hair, charcoal blazer and ivory top. Use reference image 2 only for the same warm walnut-and-charcoal podcast studio.\nCreate a vertical 9:16 tight head-and-shoulders portrait, much tighter than a normal speaking shot: face fills most of the frame, no table or cup, only a soft microphone blur at the extreme lower-left. She is seated on the right side of a two-person interview and looks toward the guest on image-left.\nExpression: unmistakably skeptical amusement after hearing an absurd claim. One eyebrow is clearly arched high, the other is slightly drawn down; eyes are noticeably wider and focused on the guest; forehead shows a small natural crease; lips are firmly closed with one corner pulled upward into a restrained crooked smirk. Make this expression visibly different from a neutral listening face even at thumbnail size. No open mouth and no teeth.\nPhotographic realism, warm soft studio lighting, same wood slat and charcoal acoustic panel background, natural skin texture and realistic hair.\nDo not imitate the empty room image composition. Do not add people, headphones, extra microphones, text, logos, watermark or collage. Keep this a single stable reaction portrait; restrained but clearly legible expression, not broad surprise or laughter.",
+  "approved_by": "项目所有者",
+  "approved_on": "2026-09-23",
+  "formal_reference": "host_reaction_end.png"
+}

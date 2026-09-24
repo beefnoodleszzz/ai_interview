@@ -84,7 +84,7 @@ def select_take(
         "selected_by": selected_by.strip(),
         "selected_at": datetime.now(UTC).isoformat(),
         "acting_approved": True,
-        "evidence": "owner_selected; ASR is numeric QC only",
+        "evidence": "director_selected; ASR is numeric QC only",
     }
     beat["selected_take"] = selected
     for shot in manifest["shots"]:
@@ -293,16 +293,29 @@ def generate_srt(manifest_path: str | Path, output: str | Path | None = None) ->
     manifest = load_manifest(manifest_path)
     cursor = 0.0
     rows = []
-    for beat in manifest["beats"]:
-        take = beat.get("selected_take")
-        if not isinstance(take, dict) or not take.get("acting_approved"):
-            raise ValueError(f"beat {beat['id']} needs a human-approved selected_take")
-        source = (root / take["path"]).resolve()
-        if not source.is_relative_to(root) or not source.is_file() or sha256_file(source) != take.get("sha256"):
-            raise ValueError(f"selected take missing or changed for {beat['id']}")
-        start, end = cursor, cursor + duration(source)
-        rows.append(f"{len(rows) + 1}\n{_srt_time(start)} --> {_srt_time(end)}\n{beat['text']}\n")
-        cursor = end + float(beat.get("pause_after", 0))
+    beats = {beat["id"]: beat for beat in manifest["beats"]}
+    seen: set[str] = set()
+    for shot in manifest["shots"]:
+        offset = 0.0
+        for beat_id in shot.get("beat_ids", []):
+            if beat_id not in beats or beat_id in seen:
+                raise ValueError(f"beat {beat_id} is missing or used by multiple shots")
+            seen.add(beat_id)
+            beat = beats[beat_id]
+            take = beat.get("selected_take")
+            if not isinstance(take, dict) or not take.get("acting_approved"):
+                raise ValueError(f"beat {beat_id} needs a human-approved selected_take")
+            source = (root / take["path"]).resolve()
+            if not source.is_relative_to(root) or not source.is_file() or sha256_file(source) != take.get("sha256"):
+                raise ValueError(f"selected take missing or changed for {beat_id}")
+            start, end = cursor + offset, cursor + offset + duration(source)
+            if end > cursor + float(shot["edit_duration_sec"]) + 0.001:
+                raise ValueError(f"beat {beat_id} exceeds {shot['id']} edit duration")
+            rows.append(f"{len(rows) + 1}\n{_srt_time(start)} --> {_srt_time(end)}\n{beat['text']}\n")
+            offset = end - cursor + float(beat.get("pause_after", 0))
+        cursor += float(shot["edit_duration_sec"])
+    if seen != beats.keys():
+        raise ValueError("every beat must belong to one shot for subtitles")
     target = Path(output).resolve() if output else root / "04_edit" / f"{manifest['episode_id']}.srt"
     if not target.is_relative_to(root):
         raise ValueError("subtitle output must stay inside the episode")

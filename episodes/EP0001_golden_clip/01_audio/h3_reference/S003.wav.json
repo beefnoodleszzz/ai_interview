@@ -1,0 +1,9 @@
+{
+  "source_master": "01_audio/master/shots/S003.wav",
+  "source_sha256": "3fd65b48345247d6077a50f6e3b2410a6c363332f0ce91f1cf7f514a44973bec",
+  "method": "append digital silence to 2.05 seconds for Ref2VA minimum; original Audio Master remains timing authority",
+  "path": "01_audio/h3_reference/S003.wav",
+  "sha256": "2d2b9045c802ffdd0d8f56b1a343c9f6df63fe1d1be1c16cb5f233f34d6f393c",
+  "sample_rate": 48000,
+  "channels": 1
+}

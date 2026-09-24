@@ -1,0 +1,18 @@
+{
+  "status": "SUPERSEDED_NEAR_IDENTICAL_TO_HOST_CLOSEUP",
+  "role": "S002 first_frame candidate",
+  "path": "host_reaction_start_r03.png",
+  "sha256": "a79ea3a52d04d374ba98d698d64ae7af6e9b886bc7eaa7a62013471a5c283599",
+  "dimensions": [
+    941,
+    1672
+  ],
+  "source_host_visual": "../../../../characters/host_v001/reference_candidates/host_visual_concept_r04.png",
+  "source_host_studio": "../studio_candidates/host_closeup_r01.png",
+  "source_studio_visual": "../../../../sets/studio_v001/reference_candidates/studio_wide_concept_r01.png",
+  "generated_with": "built-in image_gen",
+  "style_template": "Realistic Photography (case 377)",
+  "review_notes": "上一版与Host演播室近景及起始/结束搭档视觉变化不足，保留历史记录，不作为当前候选。",
+  "prompt": "Use case: photorealistic-natural\nAsset type: S002 主持人静默反应镜头起始关键帧候选\n输入图像：图1是已确认的主持人身份参考，严格保持同一张脸、五官、年龄感、中分深色自然长波浪、发长、深炭灰西装和象牙白上衣。图2是本集主持人演播室近景构图和棚景参考，保持同一机位、同一人物位置、同一麦克风与背景。\n场景：EP0001 固定访谈演播室，同一暖胡桃木竖条和炭灰吸音板背景，胸像近景。\n主体和表演：同一位成年女性主持人正安静听画面左侧的嘉宾说话；这是 S002 的起始帧，表情专注、轻微怀疑但克制，双唇自然闭合，眉毛处于放松基线，头部正直，眼睛看向画面左侧嘉宾。无说话、无张嘴、无明显动作。\n风格：自然写实摄影，真实皮肤纹理与真实发丝，暖色棚灯，浅景深。\n构图：竖幅 9:16，严格复用图2的裁切、摄像机高度、焦距观感、人物头部位置、视线方向、麦克风位置和背景；固定镜头，适合 FL2VA 起止帧对。\n约束：只出现同一位主持人；保持闭嘴；不加耳机、道具或新人物；头发与图1一致；避免大表情、笑容、眨眼、头部倾斜、运镜、镜头变化、文字、水印或拼贴。此图为虚构 AI 访谈主持人。",
+  "superseded_by": "host_reaction_start_r04.png"
+}

@@ -120,12 +120,33 @@ deploy_files() {
   echo "Runtime model deployed: $destination"
 }
 
+verify_sha256() {
+  local path=$1 expected=$2 actual
+  actual=$(sha256sum "$path" | awk '{print $1}')
+  [[ "$actual" == "$expected" ]] || {
+    echo "model SHA-256 mismatch: $path" >&2
+    exit 1
+  }
+}
+
 enable_model_network
 deploy_snapshot IndexTeam/IndexTTS-2.5 "$MODELS/voice/IndexTTS-2.5"
 link_index_tts_runtime "$MODELS/voice/IndexTTS-2.5"
 deploy_snapshot Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign "$MODELS/voice/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
 deploy_snapshot Qwen/Qwen3-TTS-12Hz-1.7B-Base "$MODELS/voice/Qwen3-TTS-12Hz-1.7B-Base"
 deploy_files ByteDance/LatentSync-1.6 "$MODELS/lipsync/LatentSync-1.6" whisper/tiny.pt latentsync_unet.pt
+latentsync_source="$MODELS/lipsync/LatentSync-1.6"
+latentsync_checkpoints="$APPS/LatentSync/checkpoints"
+if [[ -L "$latentsync_checkpoints" ]]; then
+  [[ $(readlink -f "$latentsync_checkpoints") == $(readlink -f "$latentsync_source") ]] || {
+    echo "LatentSync checkpoint link collision: $latentsync_checkpoints" >&2; exit 1;
+  }
+elif [[ -e "$latentsync_checkpoints" ]]; then
+  echo "LatentSync checkpoint path already exists; refusing to replace it: $latentsync_checkpoints" >&2
+  exit 1
+else
+  ln -s "$latentsync_source" "$latentsync_checkpoints"
+fi
 # The previous no-card transfer left only these two exact runtime files in a
 # staging directory.  Remove that duplicate only after the direct runtime
 # deployment has verified both source sizes.
@@ -143,6 +164,23 @@ if [[ -f "$ROOT/staging/model-source/LatentSync-1.6/latentsync_unet.pt" && \
   rmdir "$ROOT/staging/model-source" 2>/dev/null || true
 fi
 deploy_files numz/SeedVR2_comfyUI "$MODELS/upscale/SEEDVR2" seedvr2_ema_3b_fp8_e4m3fn.safetensors ema_vae_fp16.safetensors
+verify_sha256 "$MODELS/upscale/SEEDVR2/seedvr2_ema_3b_fp8_e4m3fn.safetensors" \
+  3bf1e43ebedd570e7e7a0b1b60d6a02e105978f505c8128a241cde99a8240cff
+verify_sha256 "$MODELS/upscale/SEEDVR2/ema_vae_fp16.safetensors" \
+  20678548f420d98d26f11442d3528f8b8c94e57ee046ef93dbb7633da8612ca1
+seedvr2_source="$MODELS/upscale/SEEDVR2"
+seedvr2_comfy="$APPS/ComfyUI/models/SEEDVR2"
+install -d "$(dirname "$seedvr2_comfy")"
+if [[ -L "$seedvr2_comfy" ]]; then
+  [[ $(readlink -f "$seedvr2_comfy") == $(readlink -f "$seedvr2_source") ]] || {
+    echo "SeedVR2 model link collision: $seedvr2_comfy" >&2; exit 1;
+  }
+elif [[ -e "$seedvr2_comfy" ]]; then
+  echo "SeedVR2 ComfyUI model path already exists; refusing to replace it: $seedvr2_comfy" >&2
+  exit 1
+else
+  ln -s "$seedvr2_source" "$seedvr2_comfy"
+fi
 disable_model_network
 
 "$ROOT/scripts/remote_inventory.py" >/dev/null

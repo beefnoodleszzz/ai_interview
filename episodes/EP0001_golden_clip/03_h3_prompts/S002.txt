@@ -1,0 +1,7 @@
+How the reference pictures align with the target video — Picture 1 (from Shot 1) aligns with the 0.00-second mark of the target video; Picture 2 (from Shot 1) aligns with the 5.17-second mark of the target video.
+
+integrated_multimodal_description: [Shot 1] A 5.17-second realistic live-action listening reaction in the fixed interview studio. Picture 1 gives the exact first frame: the adult Chinese female host in a charcoal blazer and ivory shirt sits on camera-right, facing camera-left toward the guest, with the black boom microphone at the lower-left edge, a walnut table, charcoal acoustic panels, and warm practical lighting. The camera holds a static eye-level medium close-up without changing lens, crop, or studio geometry. She listens with a skeptical, closed-mouth expression. Over the continuous take, her eyebrow rises slightly, her head tips only a few degrees toward the guest, and the corners of her closed lips approach a restrained almost-smile. The movement is small and continuous, never a laugh or a spoken response. By the final moment she settles into the expression and composition of Picture 2. Her gaze remains on the off-camera guest and her lips remain closed throughout. No dialogue, no narration, no extra person, no visible text, and no mouth movement suggesting speech.
+
+overall_soundscape: Quiet, continuous podcast-studio room tone with a low ventilation hum and a faint clothing rustle. No speech, laughter, or audience sound.
+
+non_diegetic_music: N/A

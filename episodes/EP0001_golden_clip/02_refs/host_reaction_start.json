@@ -1,0 +1,18 @@
+{
+  "status": "APPROVED_REFERENCE",
+  "approved_by": "项目所有者",
+  "approved_on": "2026-09-23",
+  "source_candidate": "reaction_candidates/host_reaction_start_r04.png",
+  "path": "host_reaction_start.png",
+  "sha256": "ccb28619483e7f6d899c3213f55c4c00ed1dd7170892334b18d1c5de80bc8590",
+  "dimensions": [
+    941,
+    1672
+  ],
+  "notes": "Tighter head-and-shoulders close-up than host dialogue shot; neutral attentive expression, lips closed; review match with end r03.",
+  "role": "S002 first_frame candidate; tighter reaction close-up",
+  "revision": 4,
+  "generated_with": "built-in image_gen",
+  "style_template": "Realistic Photography (case 377)",
+  "prompt": "Use case: photorealistic-natural\nAsset type: EP0001 S002 主持人静默反应镜头的起始关键帧，新构图版本\n输入图像：图1严格控制主持人的脸、五官、中分深色长波浪、发长发色、项链、深炭灰西装和象牙白内搭；图2只控制胡桃木竖条、炭灰吸音板、暖灯和房间氛围。\n镜头设计：这是反应镜头，必须明显区别于主持人说话用的胸口以上中近景。使用更紧的正面三分之四角度头肩特写，脸和头发约占画面高度的三分之二，肩部只占下方少量空间；不要看见桌面、杯子或完整桌面麦克风。画面左下可有非常少量虚化的麦克风边缘，但不能抢主体。\n表演起点：成年女性主持人安静聆听画面左侧嘉宾，专注、轻微怀疑但克制；眉毛放松，嘴唇自然闭合，眼睛看向左侧，头部平稳正直。不要微笑，不张嘴。\n场景风格：同一固定访谈演播室，暖胡桃木竖条和炭灰吸音板浅景深虚化，暖柔主光，写实相机摄影，真实皮肤和发丝。\n构图规格：9:16 竖幅，固定胸像以上近景，脸部完整且留出发顶，视线方向和光线明确；这是 S002 0.8 秒反应镜头的第一帧。\n约束：只一位主持人，严格保持图1人物身份、长波浪发型、服装；不要照搬图2的空房全景构图，不要出现桌面、杯子、耳机、字幕、文字、商标、水印或拼贴，不张嘴、不露齿、不做夸张表情。\n精修：只将嘴唇闭合，唇线接触，无缝隙无牙齿；其他全部不变。"
+}

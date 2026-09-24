@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from .package import sha256_file
-from .remote import _scp, _ssh, _worker, load_remote_config, resolve_connection
+from .remote import _publish_remote_directory, _scp, _ssh, _worker, component_worker_doctor, load_remote_config, require_worker_ready, resolve_connection
 
 SAFE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{2,119}$")
 SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,179}$")
@@ -22,7 +22,15 @@ def _status_worker(config: dict[str, Any], connection: dict[str, Any], *argument
     return _worker(config, connection, list(arguments), expected_schema=PROTOCOL, entrypoint="voice_worker.py")
 
 
-def submit_voice(package: str | Path, root: str | Path, on_submit: Callable[[], Any] | None = None) -> dict[str, Any]:
+def voice_worker_doctor(root: str | Path) -> dict[str, Any]:
+    return component_worker_doctor(root, "voice_worker.py", PROTOCOL)
+
+
+def _require_voice_ready(root: str | Path) -> dict[str, Any]:
+    return require_worker_ready(root, "voice_worker.py", PROTOCOL, "IndexTTS")
+
+
+def submit_voice(package: str | Path, root: str | Path, on_reserve: Callable[[dict[str, Any]], dict[str, Any]] | None = None) -> dict[str, Any]:
     package = Path(package).resolve()
     job_path = package / "job.json"
     if not package.is_dir() or not job_path.is_file():
@@ -40,7 +48,18 @@ def submit_voice(package: str | Path, root: str | Path, on_submit: Callable[[], 
     existing = _status_worker(config, connection, "status", "--job-id", job_id, "--json")
     match = next((item for item in existing.get("jobs", []) if item.get("job_id") == job_id), None)
     if match:
+        if match.get("location") == "inbox":
+            if match.get("request_sha256") != sha256_file(job_path):
+                raise FileExistsError("remote voice inbox job_id exists with a different package")
+            _require_voice_ready(root)
+            _apply_voice_reservation(job, job_path, on_reserve)
+            response = _status_worker(config, connection, "submit", "--job-dir", f"{config['remote']['root']}/voice/jobs/inbox/{job_id}", "--json")
+            if response.get("job_id") != job_id:
+                raise RuntimeError("remote voice inbox resume response job_id mismatch")
+            return response
         return {**match, "existing": True}
+    _require_voice_ready(root)
+    _apply_voice_reservation(job, job_path, on_reserve)
     base = f"{config['remote']['root']}/voice/jobs/inbox"
     destination = f"{base}/{job_id}"
     staging = f"{base}/.{job_id}.upload-{uuid.uuid4().hex}"
@@ -51,20 +70,47 @@ def submit_voice(package: str | Path, root: str | Path, on_submit: Callable[[], 
     if rsync:
         command = [rsync, "-az", "-e", shlex.join(["ssh", "-p", str(connection["port"]), "-o", "BatchMode=yes"]), str(package) + "/", f"{connection['target']}:{staging}/"]
     else:
-        command = [*_scp(connection), "-r", str(package) + "/.", f"{connection['target']}:{staging}/"]
+        command = [*_scp(connection, legacy_protocol=True), "-r", str(package) + "/.", f"{connection['target']}:{staging}/"]
     transfer = subprocess.run(command, capture_output=True, text=True, timeout=300, check=False)
     if transfer.returncode:
         subprocess.run(_ssh(connection, f"rm -rf -- {shlex.quote(staging)}"), capture_output=True, text=True, timeout=30, check=False)
         raise RuntimeError(transfer.stderr.strip()[-2000:] or "voice package upload failed")
-    publish = subprocess.run(_ssh(connection, f"if test -e {shlex.quote(destination)}; then exit 73; fi; mv {shlex.quote(staging)} {shlex.quote(destination)}"), capture_output=True, text=True, timeout=30, check=False)
-    if publish.returncode:
-        raise RuntimeError(publish.stderr.strip() or "voice job id already exists; refusing overwrite")
-    if on_submit:
-        on_submit()
+    _publish_remote_directory(
+        connection, staging, destination,
+        f"{config['remote']['root']}/voice/jobs/.queue.lock", "voice",
+    )
     response = _status_worker(config, connection, "submit", "--job-dir", destination, "--json")
     if response.get("job_id") != job_id:
         raise RuntimeError("remote voice response job_id mismatch")
     return response
+
+
+def _apply_voice_reservation(
+    job: dict[str, Any], job_path: Path,
+    on_reserve: Callable[[dict[str, Any]], dict[str, Any]] | None,
+) -> None:
+    if on_reserve is None:
+        raise RuntimeError("IndexTTS submission requires an atomic local budget reservation")
+    reservation = on_reserve(job)
+    if not isinstance(reservation, dict):
+        raise ValueError("local voice reservation did not return a budget")
+    per_episode = float(reservation.get("remaining_gpu_minutes_per_episode", 0.0))
+    by_shot = reservation.get("remaining_gpu_minutes_by_shot")
+    if not 0 < per_episode <= 300 or not isinstance(by_shot, dict) or not by_shot:
+        raise ValueError("local voice reservation returned an invalid GPU budget")
+    normalized = {str(key): float(value) for key, value in by_shot.items()}
+    if any(not 0 < value <= 15 for value in normalized.values()):
+        raise ValueError("local voice shot reservation must be within 0-15 GPU minutes")
+    budget = job.setdefault("budget", {})
+    if budget.get("remaining_gpu_minutes_per_episode") == per_episode and budget.get("remaining_gpu_minutes_by_shot") == normalized:
+        return
+    budget.update({
+        "remaining_gpu_minutes_per_episode": per_episode,
+        "remaining_gpu_minutes_by_shot": normalized,
+    })
+    temporary = job_path.with_name(f".{job_path.name}.{uuid.uuid4().hex}.tmp")
+    temporary.write_text(json.dumps(job, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(job_path)
 
 
 def voice_status(root: str | Path, episode_id: str, job_id: str | None = None) -> dict[str, Any]:

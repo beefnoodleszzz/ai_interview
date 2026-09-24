@@ -6,6 +6,9 @@ format: '9:16'
 fps: 24
 target_duration: 15.8
 status: PLANNED
+studio:
+  room_tone_reference: 01_audio/room_tone/studio_v001_from_S002.wav
+  room_tone_gain_db: -6
 retry_policy:
   max_attempts_per_shot: 4
   max_gpu_minutes_per_shot: 15
@@ -49,31 +52,80 @@ beats:
   text: 我们本来准备毁灭地球。
   emotion: deadpan
   pause_after: 0.45
+  selected_take:
+    candidate_id: EP0001_golden_clip_voice_r02_B01_candidate_02
+    job_id: EP0001_golden_clip_voice_r02
+    path: voice_results/EP0001_golden_clip_voice_r02/B01_candidate_02.wav
+    sha256: a97266cd509c1b8f00b8d1b00632b5e98188f38c24556c2a9ac4f4a2d9722e3d
+    asr_text: 我们本来准备毁灭地球
+    cer: 0.0
+    duration_sec: 2.507755
+    selected_by: AI director
+    selected_at: '2026-09-23T17:18:47.795521+00:00'
+    acting_approved: true
+    evidence: director_selected; ASR is numeric QC only
 - id: B02
   speaker: host
   text: 本来？
   emotion: suspicious_amused
   pause_after: 0.4
+  selected_take:
+    candidate_id: EP0001_golden_clip_voice_r02_B02_candidate_01
+    job_id: EP0001_golden_clip_voice_r02
+    path: voice_results/EP0001_golden_clip_voice_r02/B02_candidate_01.wav
+    sha256: 2da789ef9fa618243cba5d76ad8a1bec4e96440b28fe646e287bbe9d3ac9f472
+    asr_text: 本來
+    cer: 0.5
+    duration_sec: 0.708209
+    selected_by: AI director
+    selected_at: '2026-09-23T17:18:47.874640+00:00'
+    acting_approved: true
+    evidence: director_selected; ASR is numeric QC only
 - id: B03
   speaker: guest
   text: 后来领导开始刷你们短视频了。
   emotion: deadpan
   pause_after: 0.35
+  selected_take:
+    candidate_id: EP0001_golden_clip_voice_r02_B03_candidate_03
+    job_id: EP0001_golden_clip_voice_r02
+    path: voice_results/EP0001_golden_clip_voice_r02/B03_candidate_03.wav
+    sha256: 5cdb481d323b3ca00d7197657085a3eafed5e590e4443c9bd6565202be5a9aa1
+    asr_text: 后来领导开始刷你们短失拼了
+    cer: 0.1538
+    duration_sec: 3.471383
+    selected_by: AI director
+    selected_at: '2026-09-23T17:18:47.953104+00:00'
+    acting_approved: true
+    evidence: director_selected; ASR is numeric QC only
 - id: B04
   speaker: host
   text: 所以……是短视频救了地球？
   emotion: dry
   pause_after: 0.4
+  selected_take:
+    candidate_id: EP0001_golden_clip_voice_r02_B04_candidate_02
+    job_id: EP0001_golden_clip_voice_r02
+    path: voice_results/EP0001_golden_clip_voice_r02/B04_candidate_02.wav
+    sha256: 5da23eb46386b34a41782837fd939d3aeda43028dd1066e8cb2a020df21145c9
+    asr_text: 所以是短视频就了地球
+    cer: 0.1
+    duration_sec: 3.831293
+    selected_by: AI director
+    selected_at: '2026-09-23T17:18:48.031597+00:00'
+    acting_approved: true
+    evidence: director_selected; ASR is numeric QC only
 shots:
 - id: S001
   camera: guest_closeup
   speaker: guest
   beat_ids:
   - B01
-  edit_duration_sec: 3.5
+  edit_duration_sec: 3.0
+  edit_in_sec: 2.37
   generation_duration_sec: 5.1666666667
   h3_mode: ref2va
-  status: AUDIO_RENDERING
+  status: READY_FOR_EDIT
   candidate_count: 3
   prompt: 03_h3_prompts/S001.txt
   references:
@@ -82,7 +134,7 @@ shots:
     - 02_refs/studio_guest.png
     videos: []
     audios:
-    - 01_audio/master/S001_guest.wav
+    - 01_audio/master/shots/S001.wav
   audio_intent: exact guest dialogue plus quiet studio ambience
   preserve:
   - guest identity
@@ -92,15 +144,47 @@ shots:
   - extra speech
   - exaggerated gestures
   - direct eye contact with viewer
+  runtime:
+    attempt_count: 2
+    gpu_minutes: 15.008000000000003
+    job_revision: 2
+    voice_attempt_count: 1
+    voice_gpu_minutes_by_job:
+      EP0001_golden_clip_voice_r02: 0.191
+    job_id: EP0001_golden_clip_S001_r02
+    prompt_id: 035e16f2-0a0e-46e5-bce3-53906fadc41c
+    job_gpu_minutes: 14.617
+    h3_job_reserved_gpu_minutes: 14.609
+    h3_reserved_gpu_minutes: 0.0
+    last_remote_status: FAILED
+    last_error: null
+    last_failure_class: null
+    started_at: '2026-09-23T17:42:04.611561+00:00'
+    updated_at: '2026-09-24T17:14:13.602913+00:00'
+  master_audio: 01_audio/master/shots/S001.wav
+  job_revision: 2
+  selected_video: remote_results/EP0001_golden_clip_S001_r02_partial/candidate_01.mp4
+  candidate_selection:
+    candidate_id: EP0001_golden_clip_S001_r02_candidate_01
+    path: remote_results/EP0001_golden_clip_S001_r02_partial/candidate_01.mp4
+    sha256: e557a47e83ed8c691dd2af9634a47e1b114791307a4593e457efed5d54268fc3
+    selected_by: agent-director
+    selected_at: '2026-09-24T16:26:56.375429+00:00'
+    lip_grade: B
+    evidence: director_selected; visual review and deterministic QC
+    qc_status: PASS
+  edit_audio: 01_audio/mix/shots/S001_edit.wav
 - id: S002
   camera: host_reaction
   speaker: none
   beat_ids: []
-  edit_duration_sec: 0.8
+  edit_duration_sec: 2.1
+  edit_in_sec: 1.2
   generation_duration_sec: 5.1666666667
   h3_mode: fl2va
-  status: PLANNED
-  candidate_count: 3
+  status: READY_FOR_EDIT
+  candidate_count: 1
+  job_revision: 2
   prompt: 03_h3_prompts/S002.txt
   references:
     first_frame: 02_refs/host_reaction_start.png
@@ -117,16 +201,43 @@ shots:
   - speech
   - mouth movement
   - large gesture
+  runtime:
+    attempt_count: 1
+    gpu_minutes: 5.46
+    job_revision: 2
+    job_id: EP0001_golden_clip_S002_r02
+    prompt_id: 441d9af4-6913-4ead-b4d0-df4f2413f388
+    job_gpu_minutes: 5.46
+    h3_job_reserved_gpu_minutes: 15.0
+    h3_reserved_gpu_minutes: 0.0
+    last_remote_status: COMPLETE
+    last_error: null
+    last_failure_class: null
+    started_at: '2026-09-24T16:11:54.788743+00:00'
+    updated_at: '2026-09-24T17:14:13.459305+00:00'
+  selected_video: remote_results/EP0001_golden_clip_S002_r02/candidate_01.mp4
+  candidate_selection:
+    candidate_id: EP0001_golden_clip_S002_r02_candidate_01
+    path: remote_results/EP0001_golden_clip_S002_r02/candidate_01.mp4
+    sha256: c0f226c54799da3add7ca77937cad2b460228f732aa67f52ca6c1f86bbb7f94a
+    selected_by: agent-director
+    selected_at: '2026-09-24T16:28:59.794365+00:00'
+    lip_grade: A
+    evidence: director_selected; visual review and deterministic QC
+    qc_status: PASS
+  edit_audio: 01_audio/mix/shots/S002_edit.wav
 - id: S003
   camera: host_closeup
   speaker: host
   beat_ids:
   - B02
   edit_duration_sec: 1.5
+  edit_in_sec: 0.95
   generation_duration_sec: 5.1666666667
   h3_mode: ref2va
-  status: AUDIO_RENDERING
-  candidate_count: 3
+  status: READY_FOR_EDIT
+  candidate_count: 1
+  job_revision: 2
   prompt: 03_h3_prompts/S003.txt
   references:
     images:
@@ -134,7 +245,7 @@ shots:
     - 02_refs/studio_host.png
     videos: []
     audios:
-    - 01_audio/master/S003_host.wav
+    - 01_audio/master/shots/S003.wav
   audio_intent: exact host dialogue plus quiet studio ambience
   preserve:
   - host identity
@@ -143,16 +254,48 @@ shots:
   avoid:
   - extra speech
   - presenter delivery
+  runtime:
+    attempt_count: 1
+    gpu_minutes: 5.62
+    job_revision: 2
+    voice_attempt_count: 1
+    voice_gpu_minutes_by_job:
+      EP0001_golden_clip_voice_r02: 0.118
+    job_id: EP0001_golden_clip_S003_r02
+    prompt_id: null
+    job_gpu_minutes: 5.502
+    h3_job_reserved_gpu_minutes: 14.882
+    h3_reserved_gpu_minutes: 0.0
+    last_remote_status: COMPLETE
+    last_error: null
+    last_failure_class: null
+    started_at: '2026-09-24T16:29:57.127590+00:00'
+    updated_at: '2026-09-24T17:14:13.496594+00:00'
+  master_audio: 01_audio/master/shots/S003.wav
+  h3_reference_audio: 01_audio/h3_reference/S003.wav
+  edit_audio: 01_audio/mix/shots/S003_edit.wav
+  selected_video: remote_results/EP0001_golden_clip_S003_r02/candidate_01.mp4
+  candidate_selection:
+    candidate_id: EP0001_golden_clip_S003_r02_candidate_01
+    path: remote_results/EP0001_golden_clip_S003_r02/candidate_01.mp4
+    sha256: cfa7b1205b179110e1fe47d1d624df90dae9dff976971f06d61bc82669059af5
+    selected_by: agent-director
+    selected_at: '2026-09-24T16:40:03.988831+00:00'
+    lip_grade: B
+    evidence: director_selected; visual review and deterministic QC
+    qc_status: PASS
 - id: S004
   camera: guest_closeup
   speaker: guest
   beat_ids:
   - B03
-  edit_duration_sec: 5.4
+  edit_duration_sec: 4.3
+  edit_in_sec: 1.74
   generation_duration_sec: 5.875
   h3_mode: ref2va
-  status: AUDIO_RENDERING
-  candidate_count: 3
+  status: READY_FOR_EDIT
+  candidate_count: 1
+  job_revision: 2
   prompt: 03_h3_prompts/S004.txt
   references:
     images:
@@ -160,7 +303,7 @@ shots:
     - 02_refs/studio_guest.png
     videos: []
     audios:
-    - 01_audio/master/S004_guest.wav
+    - 01_audio/master/shots/S004.wav
   audio_intent: exact guest dialogue plus quiet studio ambience
   preserve:
   - guest identity
@@ -169,16 +312,47 @@ shots:
   avoid:
   - extra speech
   - exaggerated gesture
+  runtime:
+    attempt_count: 1
+    gpu_minutes: 6.946
+    job_revision: 2
+    voice_attempt_count: 1
+    voice_gpu_minutes_by_job:
+      EP0001_golden_clip_voice_r02: 0.16
+    job_id: EP0001_golden_clip_S004_r02
+    prompt_id: null
+    job_gpu_minutes: 6.786
+    h3_job_reserved_gpu_minutes: 14.84
+    h3_reserved_gpu_minutes: 0.0
+    last_remote_status: COMPLETE
+    last_error: null
+    last_failure_class: null
+    started_at: '2026-09-24T16:40:10.249549+00:00'
+    updated_at: '2026-09-24T17:14:13.532176+00:00'
+  master_audio: 01_audio/master/shots/S004.wav
+  edit_audio: 01_audio/mix/shots/S004_edit.wav
+  selected_video: remote_results/EP0001_golden_clip_S004_r02/candidate_01.mp4
+  candidate_selection:
+    candidate_id: EP0001_golden_clip_S004_r02_candidate_01
+    path: remote_results/EP0001_golden_clip_S004_r02/candidate_01.mp4
+    sha256: a9bd6aa25582c9fe062fb86920e79fe2d95e9ab66e291ec299f144ad1029c9fb
+    selected_by: agent-director
+    selected_at: '2026-09-24T16:50:43.168746+00:00'
+    lip_grade: B
+    evidence: director_selected; visual review and deterministic QC
+    qc_status: PASS
 - id: S005
   camera: host_closeup
   speaker: host
   beat_ids:
   - B04
-  edit_duration_sec: 4.6
+  edit_duration_sec: 4.9
+  edit_in_sec: 1.07
   generation_duration_sec: 5.1666666667
   h3_mode: ref2va
-  status: AUDIO_RENDERING
-  candidate_count: 3
+  status: READY_FOR_EDIT
+  candidate_count: 1
+  job_revision: 2
   prompt: 03_h3_prompts/S005.txt
   references:
     images:
@@ -186,7 +360,7 @@ shots:
     - 02_refs/studio_host.png
     videos: []
     audios:
-    - 01_audio/master/S005_host.wav
+    - 01_audio/master/shots/S005.wav
   audio_intent: exact host dialogue plus quiet studio ambience
   preserve:
   - host identity
@@ -196,11 +370,40 @@ shots:
   - extra speech
   - broad smile
   - presenter delivery
+  runtime:
+    attempt_count: 1
+    gpu_minutes: 5.698
+    job_revision: 2
+    voice_attempt_count: 1
+    voice_gpu_minutes_by_job:
+      EP0001_golden_clip_voice_r02: 0.181
+    job_id: EP0001_golden_clip_S005_r02
+    prompt_id: null
+    job_gpu_minutes: 5.517
+    h3_job_reserved_gpu_minutes: 14.819
+    h3_reserved_gpu_minutes: 0.0
+    last_remote_status: COMPLETE
+    last_error: null
+    last_failure_class: null
+    started_at: '2026-09-24T16:50:50.403647+00:00'
+    updated_at: '2026-09-24T17:14:13.566510+00:00'
+  master_audio: 01_audio/master/shots/S005.wav
+  edit_audio: 01_audio/mix/shots/S005_edit.wav
+  selected_video: remote_results/EP0001_golden_clip_S005_r02/candidate_01.mp4
+  candidate_selection:
+    candidate_id: EP0001_golden_clip_S005_r02_candidate_01
+    path: remote_results/EP0001_golden_clip_S005_r02/candidate_01.mp4
+    sha256: e23d30f5e89f621128f40ba44161356b6fc54151d47ce07cfcfa6b8f0b248a20
+    selected_by: agent-director
+    selected_at: '2026-09-24T16:59:52.595521+00:00'
+    lip_grade: B
+    evidence: director_selected; visual review and deterministic QC
+    qc_status: PASS
 voice_design_jobs:
   EP0001_golden_clip_host_voice_v001_design_r01:
     status: FAILED
     gpu_minutes: 0.0
-    updated_at: '2026-09-23T02:31:57.731393+00:00'
+    updated_at: '2026-09-23T03:51:07.083524+00:00'
     error: 'FlashAttention2 has been toggled on, but it cannot be used due to the
       following error: the package flash_attn seems to be not installed. Please refer
       to the documentation of https://huggingface.co/docs/transformers/perf_infer_gpu_one#flashattention-2
@@ -209,17 +412,138 @@ voice_design_jobs:
   EP0001_golden_clip_host_voice_v001_design_r02:
     status: COMPLETE
     gpu_minutes: 0.625
-    updated_at: '2026-09-23T02:35:02.098384+00:00'
+    updated_at: '2026-09-23T03:51:07.065978+00:00'
     error: null
     character_id: host
   EP0001_golden_clip_guest_voice_v001_design_r01:
     status: COMPLETE
     gpu_minutes: 0.671
-    updated_at: '2026-09-23T02:41:35.518944+00:00'
+    updated_at: '2026-09-23T03:51:07.045087+00:00'
     error: null
     character_id: guest
 voice_jobs:
   EP0001_golden_clip_voice_r01:
-    status: RUNNING
-    updated_at: '2026-09-23T03:18:50.736243+00:00'
+    status: FAILED
+    updated_at: '2026-09-23T03:44:34.243671+00:00'
+    error: Worker process was no longer alive while state remained RUNNING at loading_model;
+      no candidate outputs were present.
+  EP0001_golden_clip_voice_r02:
+    status: COMPLETE
+    remote_status: COMPLETE
+    revision: 2
+    reserved_gpu_minutes_by_shot: {}
+    reserved_gpu_minutes: 0.0
+    gpu_minutes_by_shot:
+      S001: 0.191
+      S003: 0.118
+      S004: 0.16
+      S005: 0.181
+    updated_at: '2026-09-23T17:09:47.374067+00:00'
     error: null
+    accounted_gpu_minutes_by_shot:
+      S001: 0.191
+      S003: 0.118
+      S004: 0.16
+      S005: 0.181
+voice_job_revision: 2
+audio_master:
+  path: 01_audio/master/EP0001_golden_clip_audio_master.wav
+  sha256: d7ecd43dee7ded2fa4ade6320a37922946d3a3afa90e5f59ca36777fccc20857
+  sample_rate: 48000
+  channels: 1
+  shot_masters:
+    S001: 01_audio/master/shots/S001.wav
+    S003: 01_audio/master/shots/S003.wav
+    S004: 01_audio/master/shots/S004.wav
+    S005: 01_audio/master/shots/S005.wav
+audio_mix:
+  shot_mixes:
+    S001: 01_audio/mix/shots/S001_edit.wav
+    S002: 01_audio/mix/shots/S002_edit.wav
+    S003: 01_audio/mix/shots/S003_edit.wav
+    S004: 01_audio/mix/shots/S004_edit.wav
+    S005: 01_audio/mix/shots/S005_edit.wav
+  sample_rate: 48000
+  channels: 1
+  room_tone_gain_db: -6.0
+edit_lock:
+  locked_at: '2026-09-24T17:27:36.700664+00:00'
+  locked_by: agent-director
+  assets:
+  - shot_id: S001
+    field: selected_video
+    path: remote_results/EP0001_golden_clip_S001_r02_partial/candidate_01.mp4
+    sha256: e557a47e83ed8c691dd2af9634a47e1b114791307a4593e457efed5d54268fc3
+  - shot_id: S001
+    field: edit_audio
+    path: 01_audio/mix/shots/S001_edit.wav
+    sha256: 84f4b8fc714b670864f476e8a72e1c8387985598cc679bd9d84535676f419aaf
+  - shot_id: S001
+    field: master_audio
+    path: 01_audio/master/shots/S001.wav
+    sha256: 1ba574cc484fbfa02ce89fa720ced2f27d0e97326eb03e2616db77e2aab1053b
+  - shot_id: S002
+    field: selected_video
+    path: remote_results/EP0001_golden_clip_S002_r02/candidate_01.mp4
+    sha256: c0f226c54799da3add7ca77937cad2b460228f732aa67f52ca6c1f86bbb7f94a
+  - shot_id: S002
+    field: edit_audio
+    path: 01_audio/mix/shots/S002_edit.wav
+    sha256: 184b923428dbc714d3409f1761516d8e5ef8b317db9998cf1bae1bc43ae8cc9a
+  - shot_id: S003
+    field: selected_video
+    path: remote_results/EP0001_golden_clip_S003_r02/candidate_01.mp4
+    sha256: cfa7b1205b179110e1fe47d1d624df90dae9dff976971f06d61bc82669059af5
+  - shot_id: S003
+    field: edit_audio
+    path: 01_audio/mix/shots/S003_edit.wav
+    sha256: 7097ad07de491666acb4835d5228d86b2ff6d1f5d1c7a978d6b9c0f69326416c
+  - shot_id: S003
+    field: master_audio
+    path: 01_audio/master/shots/S003.wav
+    sha256: 3fd65b48345247d6077a50f6e3b2410a6c363332f0ce91f1cf7f514a44973bec
+  - shot_id: S004
+    field: selected_video
+    path: remote_results/EP0001_golden_clip_S004_r02/candidate_01.mp4
+    sha256: a9bd6aa25582c9fe062fb86920e79fe2d95e9ab66e291ec299f144ad1029c9fb
+  - shot_id: S004
+    field: edit_audio
+    path: 01_audio/mix/shots/S004_edit.wav
+    sha256: 3303689a8972470e7b0b15cbe983e21942e50f2635d7fb7a0e175ea49cbe9044
+  - shot_id: S004
+    field: master_audio
+    path: 01_audio/master/shots/S004.wav
+    sha256: d5714d20672cb78885b96bc6b2c83baea7478cc3a33133ca0a0bae5933583fc0
+  - shot_id: S005
+    field: selected_video
+    path: remote_results/EP0001_golden_clip_S005_r02/candidate_01.mp4
+    sha256: e23d30f5e89f621128f40ba44161356b6fc54151d47ce07cfcfa6b8f0b248a20
+  - shot_id: S005
+    field: edit_audio
+    path: 01_audio/mix/shots/S005_edit.wav
+    sha256: a4ae5d67e1d1296b4953fadcf3a7607fffed08cc20a264807cf88576228d10e6
+  - shot_id: S005
+    field: master_audio
+    path: 01_audio/master/shots/S005.wav
+    sha256: a6e681bc15921db4ed813350896aa55a830cabec00baaa2a22564a275ba704bd
+  timing:
+  - shot_id: S001
+    edit_in_sec: 2.37
+    edit_duration_sec: 3.0
+  - shot_id: S002
+    edit_in_sec: 1.2
+    edit_duration_sec: 2.1
+  - shot_id: S003
+    edit_in_sec: 0.95
+    edit_duration_sec: 1.5
+  - shot_id: S004
+    edit_in_sec: 1.74
+    edit_duration_sec: 4.3
+  - shot_id: S005
+    edit_in_sec: 1.07
+    edit_duration_sec: 4.9
+  evidence: director_selected; visual review and deterministic QC
+  revision: 2
+  supersedes: 07_edit/edit_locks/edit_lock_r01.json
+  reason: S003 H3 embedded-audio waveform offset 0.9495s; previous edit_in_sec 0.47s
+    caused a 0.4795s mouth/audio error

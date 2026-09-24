@@ -10,12 +10,14 @@ from .audio import build_audio_master, build_edit_mix, generate_srt, select_take
 from .manifest import load_manifest
 from .media import build_roughcut_command, deterministic_qc, final_master_qc, local_tool_status, lock_edit, select_video_candidate
 from .package import package_h3, package_voice, package_voice_design
-from .remote import cleanup_completed, doctor as remote_doctor, pull, status, submit
+from .postprocess import package_latentsync, package_seedvr2, select_postprocess_result
+from .remote import audit_remote, cleanup_completed, doctor as remote_doctor, pull, status, submit
 from .remote import resume as remote_resume
-from .remote_voice import pull_voice, submit_voice, voice_status
-from .remote_voice_design import pull_voice_design, submit_voice_design, voice_design_status
+from .remote_voice import pull_voice, submit_voice, voice_status, voice_worker_doctor
+from .remote_voice_design import pull_voice_design, submit_voice_design, voice_design_status, voice_design_worker_doctor
+from .remote_postprocess import cleanup_postprocess, postprocess_doctor, pull_postprocess, postprocess_status, submit_postprocess
 from .review import approve_final, load_checklist
-from .state import begin_h3_attempt, read_budget, record_remote_job, record_voice_design_remote, record_voice_remote
+from .state import begin_h3_attempt, read_budget, record_postprocess_remote, record_remote_job, record_voice_design_remote, record_voice_remote, reserve_postprocess_attempt, reserve_voice_attempt, reserve_voice_design_attempt
 from .voice_design import freeze_voice_reference
 
 
@@ -24,6 +26,11 @@ def _parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("doctor")
     commands.add_parser("remote-doctor")
+    commands.add_parser("remote-audit")
+    commands.add_parser("voice-doctor")
+    commands.add_parser("voice-design-doctor")
+    post_doctor = commands.add_parser("postprocess-doctor")
+    post_doctor.add_argument("--mode", choices=("latentsync", "seedvr2"), required=True)
     validate = commands.add_parser("validate")
     validate.add_argument("manifest")
     voice = commands.add_parser("package-voice")
@@ -109,13 +116,41 @@ def _parser() -> argparse.ArgumentParser:
     rough.add_argument("manifest")
     rough.add_argument("output")
     rough.add_argument("--execute", action="store_true")
+    latentsync = commands.add_parser("package-latentsync")
+    latentsync.add_argument("manifest")
+    latentsync.add_argument("shot_id")
+    latentsync.add_argument("--selected-by", required=True)
+    seedvr2 = commands.add_parser("package-seedvr2")
+    seedvr2.add_argument("manifest")
+    seedvr2.add_argument("shot_id")
+    seedvr2.add_argument("--selected-by", required=True)
+    submit_post = commands.add_parser("submit-postprocess")
+    submit_post.add_argument("package")
+    status_post = commands.add_parser("postprocess-status")
+    status_post.add_argument("episode_id")
+    status_post.add_argument("--job-id")
+    pull_post = commands.add_parser("pull-postprocess")
+    pull_post.add_argument("job_id")
+    pull_post.add_argument("destination")
+    select_post = commands.add_parser("select-postprocess")
+    select_post.add_argument("manifest")
+    select_post.add_argument("shot_id")
+    select_post.add_argument("result_dir")
+    select_post.add_argument("--selected-by", required=True)
+    select_post.add_argument("--lip-grade", choices=("A", "B"))
+    cleanup_post = commands.add_parser("cleanup-postprocess")
+    cleanup_post.add_argument("job_id")
+    cleanup_post.add_argument("local_import")
     return parser
 
 
 def _manifest_for_remote_job(episode_id: str, job_id: str, jobs_dir: str) -> tuple[Path, Path] | None:
     episode_root = Path.cwd() / "episodes"
     direct = episode_root / episode_id
-    candidates = [direct, *sorted(path for path in episode_root.iterdir() if path.is_dir() and path != direct)] if episode_root.is_dir() else []
+    candidates = [direct, *sorted(
+        path for path in episode_root.iterdir()
+        if path.is_dir() and path != direct and path.name != "_template"
+    )] if episode_root.is_dir() else []
     for root in candidates:
         request = root / jobs_dir / job_id / "job.json"
         manifest_path = root / "episode.yaml"
@@ -146,6 +181,22 @@ def main() -> int:
         result = remote_doctor(Path.cwd())
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0 if result["status"] == "PASS" else 2
+    if args.command == "remote-audit":
+        result = audit_remote(Path.cwd())
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0 if result["status"] == "PASS" else 2
+    if args.command == "voice-doctor":
+        result = voice_worker_doctor(Path.cwd())
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0 if result["status"] in {"READY", "CONFIGURED_NO_GPU"} else 2
+    if args.command == "voice-design-doctor":
+        result = voice_design_worker_doctor(Path.cwd())
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0 if result["status"] in {"READY", "CONFIGURED_NO_GPU"} else 2
+    if args.command == "postprocess-doctor":
+        result = postprocess_doctor(Path.cwd(), args.mode)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0 if result["status"] in {"READY", "CONFIGURED_NO_GPU"} else 2
     if args.command == "submit-h3":
         package_path = Path(args.package).resolve()
         job = json.loads((package_path / "job.json").read_text(encoding="utf-8"))
@@ -176,10 +227,10 @@ def main() -> int:
         result = submit_voice(
             package_path,
             Path.cwd(),
-            on_submit=lambda: record_voice_remote(manifest_path, job, {"job_id": job["job_id"], "status": "SUBMITTED"}),
+            on_reserve=lambda request: reserve_voice_attempt(manifest_path, request),
         )
-        if result.get("existing"):
-            record_voice_remote(manifest_path, job, result)
+        job = json.loads((package_path / "job.json").read_text(encoding="utf-8"))
+        record_voice_remote(manifest_path, job, result)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
     if args.command == "voice-status":
@@ -200,9 +251,12 @@ def main() -> int:
         manifest_path = package_path.parent.parent / "episode.yaml"
         if not manifest_path.is_file():
             raise FileNotFoundError("VoiceDesign package must be inside episodes/<episode_id>/voice_design_jobs/<job_id>")
-        result = submit_voice_design(package_path, Path.cwd(), on_submit=lambda: record_voice_design_remote(manifest_path, job, {"job_id": job["job_id"], "status": "SUBMITTED"}))
-        if result.get("existing"):
-            record_voice_design_remote(manifest_path, job, result)
+        result = submit_voice_design(
+            package_path, Path.cwd(),
+            on_reserve=lambda request: reserve_voice_design_attempt(manifest_path, request),
+        )
+        job = json.loads((package_path / "job.json").read_text(encoding="utf-8"))
+        record_voice_design_remote(manifest_path, job, result)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
     if args.command == "voice-design-status":
@@ -212,6 +266,17 @@ def main() -> int:
             if found:
                 manifest_path, job_path = found
                 record_voice_design_remote(manifest_path, json.loads(job_path.read_text(encoding="utf-8")), remote_job)
+            else:
+                manifest_path = Path.cwd() / "episodes" / args.episode_id / "episode.yaml"
+                if manifest_path.is_file():
+                    manifest = load_manifest(manifest_path)
+                    local_job = manifest.get("voice_design_jobs", {}).get(remote_job["job_id"])
+                    if isinstance(local_job, dict):
+                        record_voice_design_remote(
+                            manifest_path,
+                            {"job_id": remote_job["job_id"], "character_id": local_job.get("character_id")},
+                            remote_job,
+                        )
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
     if args.command == "pull-voice-design":
@@ -227,8 +292,13 @@ def main() -> int:
         result = status(Path.cwd(), args.episode_id, args.shot_id)
         manifest_path = Path.cwd() / "episodes" / args.episode_id / "episode.yaml"
         if manifest_path.is_file():
+            current = load_manifest(manifest_path)
+            active_jobs = {
+                shot["id"]: shot.get("runtime", {}).get("job_id")
+                for shot in current["shots"]
+            }
             for remote_job in result.get("jobs", []):
-                if remote_job.get("shot_id"):
+                if remote_job.get("shot_id") and remote_job.get("job_id") == active_jobs.get(remote_job["shot_id"]):
                     record_remote_job(manifest_path, remote_job["shot_id"], remote_job)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
@@ -264,6 +334,54 @@ def main() -> int:
         return 0
     if args.command == "lock-edit":
         print(json.dumps(lock_edit(args.manifest, args.selected_by), ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "package-latentsync":
+        print(package_latentsync(args.manifest, args.shot_id, selected_by=args.selected_by))
+        return 0
+    if args.command == "package-seedvr2":
+        print(package_seedvr2(args.manifest, args.shot_id, selected_by=args.selected_by))
+        return 0
+    if args.command == "submit-postprocess":
+        package_path = Path(args.package).resolve()
+        job = json.loads((package_path / "job.json").read_text(encoding="utf-8"))
+        manifest_path = package_path.parent.parent.parent / "episode.yaml"
+        if not manifest_path.is_file():
+            raise FileNotFoundError("postprocess package must be inside episodes/<episode_id>/postprocess_jobs/<mode>/<job_id>")
+        result = submit_postprocess(
+            package_path, Path.cwd(),
+            on_reserve=lambda request: reserve_postprocess_attempt(manifest_path, request),
+        )
+        record_postprocess_remote(manifest_path, job, result)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "postprocess-status":
+        result = postprocess_status(Path.cwd(), args.episode_id, args.job_id)
+        manifest_path = Path.cwd() / "episodes" / args.episode_id / "episode.yaml"
+        if manifest_path.is_file():
+            for remote_job in result.get("jobs", []):
+                found = _manifest_for_remote_job(args.episode_id, remote_job["job_id"], f"postprocess_jobs/{remote_job['mode']}")
+                if found:
+                    local_manifest, request = found
+                    record_postprocess_remote(local_manifest, json.loads(request.read_text(encoding="utf-8")), remote_job)
+                else:
+                    manifest = load_manifest(manifest_path)
+                    local_job = manifest.get("postprocess_jobs", {}).get(remote_job["job_id"])
+                    if isinstance(local_job, dict):
+                        record_postprocess_remote(
+                            manifest_path,
+                            {"job_id": remote_job["job_id"], "mode": local_job.get("mode"), "shot_id": local_job.get("shot_id")},
+                            remote_job,
+                        )
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "pull-postprocess":
+        print(pull_postprocess(Path.cwd(), args.job_id, args.destination))
+        return 0
+    if args.command == "select-postprocess":
+        print(json.dumps(select_postprocess_result(args.manifest, args.shot_id, args.result_dir, selected_by=args.selected_by, lip_grade=args.lip_grade), ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "cleanup-postprocess":
+        print(json.dumps(cleanup_postprocess(Path.cwd(), args.job_id, args.local_import), ensure_ascii=False, indent=2))
         return 0
     manifest_path = Path(args.manifest).resolve()
     manifest = load_manifest(manifest_path)

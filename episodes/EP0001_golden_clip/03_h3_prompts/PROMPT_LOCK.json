@@ -1,0 +1,37 @@
+{
+  "episode_id": "EP0001_golden_clip",
+  "status": "FINAL_IMMUTABLE_INPUT",
+  "locked_on": "2026-09-24",
+  "prompts": {
+    "S001": {
+      "path": "S001.txt",
+      "source_draft": "drafts/S001.txt",
+      "sha256": "7560a9b8c8880f628ee2ce9d5acf01e691a5849e798099eccd44e085420134bb",
+      "bytes": 2802
+    },
+    "S002": {
+      "path": "S002.txt",
+      "source_draft": "drafts/S002.txt",
+      "sha256": "f04017c3fa12e7a6416637a86cd7179264c57db87a4ce62ef32fb8498b9dca29",
+      "bytes": 1492
+    },
+    "S003": {
+      "path": "S003.txt",
+      "source_draft": "drafts/S003.txt",
+      "sha256": "90dcfcf6511ebfad212891f86fdc60254d1c9e71d1c5c1e166d3e8dc035f498b",
+      "bytes": 2325
+    },
+    "S004": {
+      "path": "S004.txt",
+      "source_draft": "drafts/S004.txt",
+      "sha256": "8291423be49dadda745e7b28c51b20950f5899fbaf0181e9233c41fe88d16edb",
+      "bytes": 2571
+    },
+    "S005": {
+      "path": "S005.txt",
+      "source_draft": "drafts/S005.txt",
+      "sha256": "191a77a56eb1337f1057b7f4085d4b2be8d8c69148e9c1da5babd6cf17b72683",
+      "bytes": 2504
+    }
+  }
+}

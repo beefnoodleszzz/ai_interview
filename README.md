@@ -20,7 +20,7 @@ AI 原生访谈 / 对谈视频生产系统的本地管理根目录。
 - `characters/`：主持人和嘉宾的 Character Bible、参考图、声音与表情资产。
 - `sets/`：Studio Bible、固定机位和灯光参考。
 - `episodes/`：按集隔离的生产文件；`_template/` 是目录模板。
-- `workflows/`：版本化的 ComfyUI API Format 工作流。
+- `remote/workflows/`：版本化的 ComfyUI API Format 工作流。
 - `orchestrator/`：manifest、任务状态机、重试/预算护栏、断点续传和 FFmpeg 编排代码。
 - `logs/`：ComfyUI、TTS 与 orchestrator 运行日志。
 - `docs/`：教程、操作指南、执行矩阵与架构解释。
@@ -30,7 +30,9 @@ AI 原生访谈 / 对谈视频生产系统的本地管理根目录。
 
 ## 当前 Gate
 
-本地控制面关键路径和 AutoDL Worker/ASR 环境已搭建。当前先由项目所有者选择并冻结声音候选、由导演审核 Character/Studio 参考，再做项目级 IndexTTS/ASR 实测和 15–20 秒 H3 黄金片段。黄金片段通过前不得生产 70–100 秒完整集。每次 GPU 提交前核对预算与远端剩余磁盘空间。
+本地控制面关键路径和 AutoDL Worker/ASR 环境已搭建。Host 01 / Guest 01 声音候选已选定并冻结；Character/Studio 与 reaction 起止帧候选已备好，仍需导演审核和正式冻结。无卡代码/配置验收完成后，等所有者开卡再做项目级 IndexTTS/ASR、15–20 秒 H3 黄金片段与后处理实测。黄金片段通过前不得生产 70–100 秒完整集。每次 GPU 提交前核对原子预算预留和远端剩余磁盘空间。
+
+后续每集按 [持续生产操作手册](docs/how-to/production-runbook.md) 执行；EP0001 从[无卡交接清单](episodes/EP0001_golden_clip/EP0001_NO_GPU_HANDOFF.md)继续。
 
 完整需求基线见：
 `00_management/requirements/AI_Interview_Production_Pipeline_H3_ComfyUI_AutoDL_v1_1.md`

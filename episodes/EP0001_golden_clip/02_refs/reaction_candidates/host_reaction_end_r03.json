@@ -1,0 +1,18 @@
+{
+  "status": "SUPERSEDED_REACTION_TOO_SUBTLE",
+  "role": "S002 last_frame candidate; readable restrained reaction",
+  "revision": 3,
+  "source_host_reaction_start": "host_reaction_start_r04.png",
+  "source_host_identity": "../host_identity.png",
+  "generated_with": "built-in image_gen",
+  "style_template": "Realistic Photography (case 377)",
+  "review_notes": "表情变化仍过于接近起始帧；保留历史版本，不作为当前候选。",
+  "path": "host_reaction_end_r03.png",
+  "sha256": "a52a6ae38e86af8c3c813bbbd659db864ef2e1b4a4d2b540e4ba155e8a155db4",
+  "dimensions": [
+    941,
+    1672
+  ],
+  "prompt": "Use case: identity-preserve\nAsset type: S002 主持人静默反应镜头结束关键帧，与新起始帧形成可读的表情变化\n输入图像：图1是修正后的新起始帧，锁定它的身份、近景裁切、头部位置、眼线、发型、衣服、项链、光线和背景；图2是正式 Host 身份参考。\n生成同一镜头之后一瞬间。明确表现她听到意外信息后的克制反应：画面右侧的眉毛明显抬高一点，另一侧眉毛轻微跟随；眼睛略微睁大但仍自然；嘴唇完全闭合，在闭合的唇线上形成一侧轻轻上扬的压笑，能看出她在努力不笑。表情差异要比起始帧清楚可辨，但保持干幽默的克制，不能夸张。\n必须保持：图1同一张脸和五官、同一中分深色长波浪、同一头部朝向和画面左侧视线、同一紧特写裁切和人物大小、同一服装项链、同一暖胡桃木/炭灰背景、同一景深与光线；麦克风仍只在左下角虚化边缘出现。双唇接触闭合，不露牙、不张嘴。\n真实相机人像，肤质和发丝自然。只改变眉眼的轻微惊讶和闭嘴压笑；禁止改变镜位、头部角度、身份、服装或背景；不要眨眼、说话、露齿笑、张口、额外人物、文字、水印、拼贴。",
+  "superseded_by": "host_reaction_end_r04.png"
+}

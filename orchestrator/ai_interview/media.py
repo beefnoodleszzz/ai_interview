@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 import shutil
 import subprocess
@@ -37,11 +38,14 @@ def build_roughcut_command(
     episode_root: Path, manifest: Mapping[str, Any], output: Path
 ) -> list[str]:
     episode_root = episode_root.resolve()
+    locked_timing = manifest.get("edit_lock", {}).get("timing") if isinstance(manifest.get("edit_lock"), dict) else None
+    if locked_timing is not None and locked_timing != _edit_timing(manifest):
+        raise ValueError("shot edit timing differs from the edit lock")
     inputs: list[str] = []
     filters: list[str] = []
     concat_inputs: list[str] = []
     for index, shot in enumerate(manifest["shots"]):
-        video_value = shot.get("selected_video")
+        video_value = shot.get("upscaled_video") or shot.get("selected_video")
         audio_value = shot.get("edit_audio")
         if not isinstance(video_value, str) or not isinstance(audio_value, str):
             raise ValueError(f"{shot['id']} needs selected_video and a room-tone edit_audio mix")
@@ -51,13 +55,32 @@ def build_roughcut_command(
             raise ValueError(f"{shot['id']} media must stay inside the episode")
         if not video.is_file() or not audio.is_file():
             raise FileNotFoundError(f"{shot['id']} selected media is missing")
+        if shot.get("upscaled_video"):
+            selection = shot.get("upscale_selection", {})
+            if selection.get("path") != video_value or selection.get("sha256") != sha256_file(video):
+                raise ValueError(f"{shot['id']} upscaled video differs from its human selection")
+            lock = manifest.get("edit_lock", {}).get("assets", [])
+            for field in ("selected_video", "edit_audio"):
+                entry = next((item for item in lock if item.get("shot_id") == shot["id"] and item.get("field") == field), None)
+                source = (episode_root / shot[field]).resolve()
+                if not entry or entry.get("path") != shot[field] or not source.is_file() or entry.get("sha256") != sha256_file(source):
+                    raise ValueError(f"{shot['id']}.{field} differs from the edit lock")
         inputs += ["-i", str(video), "-i", str(audio)]
         seconds = float(shot["edit_duration_sec"])
+        edit_in = float(shot.get("edit_in_sec", 0))
+        if not math.isfinite(edit_in) or edit_in < 0:
+            raise ValueError(f"{shot['id']} edit_in_sec must be a nonnegative finite number")
+        tail_hold = max(0.0, edit_in + seconds - duration(video)) if edit_in else 0.0
+        if tail_hold > 0.95:
+            raise ValueError(f"{shot['id']} would need more than 0.95 seconds of held video")
         v_index, a_index = index * 2, index * 2 + 1
+        tail_filter = f",tpad=stop_mode=clone:stop_duration={tail_hold + 1 / manifest['fps']:.6f}" if tail_hold else ""
         filters.append(
-            f"[{v_index}:v]trim=duration={seconds},setpts=PTS-STARTPTS,fps={manifest['fps']},"
+            f"[{v_index}:v]trim=start={edit_in}:duration={seconds},setpts=PTS-STARTPTS,fps={manifest['fps']},"
+            f"{tail_filter.lstrip(',') + ',' if tail_filter else ''}"
             "scale=1080:1920:force_original_aspect_ratio=decrease,"
             "pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black,format=yuv420p"
+            f",trim=duration={seconds},setpts=PTS-STARTPTS"
             f"[v{index}]"
         )
         filters.append(
@@ -65,7 +88,7 @@ def build_roughcut_command(
             f"apad=whole_dur={seconds},atrim=duration={seconds},asetpts=PTS-STARTPTS[a{index}]"
         )
         concat_inputs.append(f"[v{index}][a{index}]")
-    filters.append("".join(concat_inputs) + f"concat=n={len(concat_inputs)}:v=1:a=1[v][a]")
+    filters.append("".join(concat_inputs) + f"concat=n={len(concat_inputs)}:v=1:a=1[concat_v][a];[concat_v]fps={manifest['fps']}[v]")
     return [
         "ffmpeg", "-nostdin", "-hide_banner", "-n", *inputs,
         "-filter_complex", ";".join(filters), "-map", "[v]", "-map", "[a]",
@@ -191,8 +214,18 @@ def select_video_candidate(
     if not metadata_path.is_relative_to(root) or not metadata_path.is_file():
         raise FileNotFoundError("candidate metadata must be inside the episode")
     metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-    if metadata.get("shot_id") != shot_id:
-        raise ValueError("candidate metadata shot_id does not match the selected shot")
+    active_job_id = shot.get("runtime", {}).get("job_id")
+    candidate_id = metadata.get("candidate_id")
+    if metadata.get("shot_id") is None and metadata.get("job_id") is None:
+        # Candidates produced before explicit identity fields were added still
+        # carry the immutable job id in their candidate id.
+        valid_identity = isinstance(active_job_id, str) and isinstance(candidate_id, str) and re.fullmatch(
+            re.escape(active_job_id) + r"_candidate_[0-9]{2}", candidate_id
+        ) is not None
+    else:
+        valid_identity = metadata.get("shot_id") == shot_id and metadata.get("job_id") == active_job_id
+    if not valid_identity:
+        raise ValueError("candidate metadata does not match the selected shot's active job")
     filename = metadata.get("filename")
     if not isinstance(filename, str) or Path(filename).name != filename:
         raise ValueError("candidate metadata must include a safe video filename")
@@ -210,7 +243,7 @@ def select_video_candidate(
         "selected_by": selected_by.strip(),
         "selected_at": datetime.now(UTC).isoformat(),
         "lip_grade": lip_grade,
-        "evidence": "owner_selected; not independent ground truth",
+        "evidence": "director_selected; visual review and deterministic QC",
         "qc_status": qc["status"],
     }
     if lip_grade in {"A", "B"}:
@@ -248,13 +281,22 @@ def lock_edit(manifest_path: str | Path, selected_by: str) -> dict[str, Any]:
         "locked_at": datetime.now(UTC).isoformat(),
         "locked_by": selected_by.strip(),
         "assets": entries,
-        "evidence": "owner_selected; not independent ground truth",
+        "timing": _edit_timing(manifest),
+        "evidence": "director_selected; visual review and deterministic QC",
     }
     existing = manifest.get("edit_lock")
     if existing:
-        if existing.get("assets") == entries and existing.get("locked_by") == selected_by.strip():
+        if existing.get("assets") == entries and existing.get("timing") == lock["timing"] and existing.get("locked_by") == selected_by.strip():
             return existing
         raise FileExistsError("edit lock already exists; create a new revision to change selected media")
     manifest["edit_lock"] = lock
     _atomic_save(manifest_path, manifest)
     return lock
+
+
+def _edit_timing(manifest: Mapping[str, Any]) -> list[dict[str, Any]]:
+    return [
+        {"shot_id": shot["id"], "edit_in_sec": float(shot.get("edit_in_sec", 0)),
+         "edit_duration_sec": float(shot["edit_duration_sec"])}
+        for shot in manifest["shots"]
+    ]

@@ -1,0 +1,11 @@
+{
+  "status": "APPROVED_REFERENCE",
+  "approved_by": "project owner in conversation",
+  "approved_on": "2026-09-24",
+  "role": "Guest close-up r01",
+  "source_candidate": "studio_candidates/guest_closeup_r01.png",
+  "path": "studio_guest.png",
+  "sha256": "d6eb1afb6cf6058d82691ccfade5043d2782f47e92c1d02eaab26ff19182e3df",
+  "source_sha256": "d6eb1afb6cf6058d82691ccfade5043d2782f47e92c1d02eaab26ff19182e3df",
+  "review_record": "../VISUAL_REVIEW.md"
+}

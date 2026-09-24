@@ -11,17 +11,16 @@
 - VoiceDesign 和 IndexTTS 项目 submit/status/pull、ASR 文字 QC、48 kHz master、候选选择、字幕和 room-tone edit mix 编排入口已实现。
 - Manifest 驱动 attempt/GPU 预算状态同步、失败保留、ComfyUI history 恢复和预算暂停已实现。
 - roughcut 输出时长、无覆盖、edit lock、Final QC、人工审批、验证后远程 cleanup gate 已实现。
-- Host/guest Character Bible、Studio Bible 已建立；3 张原创写实参考图已保存为候选并标明待审核。
+- Host/guest Character Bible、Studio Bible 已建立；Host r04 与 Guest r01 身份参考、Host 演播室近景 r01 和 S002 reaction start/end r04 获项目所有者批准；Guest 演播室近景和 Studio 宽景仍待审核。
 - AutoDL 实测：RTX 5090/ComfyUI/H3 doctor 曾通过；Qwen VoiceDesign 两个角色各有 2 条候选；独立 Whisper ASR venv 已安装。
 
 ## 未达到放行条件
 
-1. 声音候选没有经项目所有者试听和选择；正式 voice references 尚未冻结。
-2. 角色和演播室参考图片没有经导演审核；reaction 起止帧仍缺失。
-3. 项目级 IndexTTS→ASR→Audio Master 尚无真实端到端 job 证据。
-4. 没有真实 H3 镜头和 15–20 秒导演验收通过的黄金片段；不得启动 70–100 秒正式集。
-5. LatentSync 与 SeedVR2 有环境/权重，但尚无项目级调度器和真实任务验证。
-6. Bible/workflow/benchmark 异地备份恢复未证明；此前 OSS API 返回 `UserDisable (403)`，对象清单/清理结果未知。
+1. 用户已试听并选择 Host 01 / Guest 01，正式 48 kHz voice references 已冻结。Host r04 与 Guest r01 身份图、Host 演播室近景 r01、S002 reaction start/end r04 已由项目所有者批准；Guest 演播室近景和 Studio 宽景仍待审核，正式 Reference Pack 仍未齐全。
+2. IndexTTS 项目 job 曾因辅助模型不完整停在 `loading_model`；现已补齐 BigVGAN 并将无进程的旧 job 标为 FAILED。项目级 IndexTTS→ASR→Audio Master smoke 仍待用户开卡。
+3. 没有真实 H3 镜头和 15–20 秒导演验收通过的黄金片段；不得启动 70–100 秒正式集。
+4. LatentSync/SeedVR2 dispatcher 和远端 worker 已实现、部署；无卡 doctor 的依赖、模型与 CLI 检查通过。真实项目任务仍需 GPU smoke。
+5. Bible/workflow/benchmark 异地备份恢复未证明；此前 OSS API 返回 `UserDisable (403)`，对象清单/清理结果未知。
 
 ## 验收纪律
 

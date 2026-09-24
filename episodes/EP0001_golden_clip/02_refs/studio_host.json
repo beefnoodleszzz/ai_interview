@@ -1,0 +1,17 @@
+{
+  "status": "APPROVED_REFERENCE",
+  "approved_by": "项目所有者",
+  "approved_on": "2026-09-23",
+  "source_candidate": "studio_candidates/host_closeup_r01.png",
+  "path": "studio_host.png",
+  "sha256": "e50cf0d7153546567a918ce4441a290316876a8659b620de50566979496e6adb",
+  "dimensions": [
+    941,
+    1672
+  ],
+  "notes": "Verify the approved Host r04 face and hairstyle, leftward eyeline, closed lips, microphone clearance, and continuity with the studio wide and guest close-up.",
+  "role": "studio_host candidate for S003 and S005",
+  "generated_with": "built-in image_gen",
+  "style_template": "Realistic Photography (case 377)",
+  "prompt": "Use case: photorealistic-natural\nAsset type: EP0001 黄金访谈片段主持人演播室近景候选，供导演审核\n输入图像：图1唯一控制主持人的脸、五官、中分深色长发自然波浪、发长、发色、服装和项链；保持同一个角色身份。图2控制演播室整体空间：炭灰吸音板、暖胡桃木竖条、柔和暖灯、深色家具。图3只参考访谈近景的真实摄影质感、人物与桌面麦克风比例、浅景深；不要沿用图3嘉宾的面孔、男性特征或耳机。\n场景：图2的固定双人访谈演播室，主持人坐在右侧座位，背景为暖胡桃木竖条和炭灰吸音板，真实空间连续，不出现新房间布局。\n主体：图1中的同一位成年女性虚构主持人，穿深炭灰西装外套与象牙白圆领上衣，黑色长发中分并自然波浪垂落胸前，保持参考图的脸型、眼睛、鼻唇和自然妆容；不戴耳机。\n视觉风格与材质：真实相机拍摄，写实人像，皮肤有细微自然质感，头发呈现真实发丝与自然蓬松层次；自然低反差暖调，不磨皮、不塑料质感、不 CG。\n构图：9:16 竖幅中近景，胸口以上，人物位于画面右半部但脸完整清晰，视线看向画面左侧的嘉宾，双唇自然闭合。黑色广播麦克风从画面左下边缘进入，保持与人物有合理距离，不遮挡嘴、下巴或眼睛。与访谈短片稳定正反打机位兼容。\n灯光：柔和正面主光、轻暖轮廓光，肤色自然，背景灯不过曝；浅景深但 Studio 竖条仍可辨认。\n约束：只生成一个人、一个镜头、一个自然表情；严格锁定图1的脸和发型，严格保留图2的空间风格；不要改变服装，不要改变头发长度/分缝，不要复制图3嘉宾或耳机，不要额外人物、字幕、文字、品牌、水印、拼贴、镜面、第二支麦克风或夸张表情。此图为 AI 生成的虚构节目主持人形象。"
+}

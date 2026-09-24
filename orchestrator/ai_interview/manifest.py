@@ -93,8 +93,8 @@ def validate_manifest(value: Mapping[str, Any]) -> list[str]:
             errors.append(f"{shot_id or index}.edit_duration_sec must be positive")
         if not _positive(shot.get("generation_duration_sec")):
             errors.append(f"{shot_id or index}.generation_duration_sec must be positive")
-        elif not 124 / 24 <= float(shot["generation_duration_sec"]) <= 362 / 24:
-            errors.append(f"{shot_id or index}.generation_duration_sec must fit 124-362 H3 frames")
+        elif not 124 / 24 <= float(shot["generation_duration_sec"]) <= 345 / 24:
+            errors.append(f"{shot_id or index}.generation_duration_sec must fit 124-345 H3 frames (max 15 seconds)")
         elif abs((round(float(shot["generation_duration_sec"]) * 24) - 5) % 17) > 0:
             errors.append(f"{shot_id or index}.generation_duration_sec must align to H3 17k+5 frames")
         if _positive(shot.get("edit_duration_sec")) and _positive(shot.get("generation_duration_sec")):

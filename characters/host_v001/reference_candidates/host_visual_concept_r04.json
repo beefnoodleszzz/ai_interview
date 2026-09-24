@@ -1,0 +1,27 @@
+{
+  "status": "APPROVED_BY_PROJECT_OWNER",
+  "path": "host_visual_concept_r04.png",
+  "sha256": "bf0dfafa410545bee84702fdbe4c5b63ca2b9c46b0a86f9fbef6e640f7e7c770",
+  "dimensions": [
+    1122,
+    1402
+  ],
+  "generated_with": "built-in image_gen",
+  "style_template": "Realistic Photography (case 377)",
+  "source_references": [
+    {
+      "role": "face and hairstyle reference",
+      "filename": "pasted-image-20260923-175002.png",
+      "sha256": "df6f5ab39f8169b0428f212520ee05439856b3a0df6614702da5d77d9c32c149"
+    },
+    {
+      "role": "wardrobe and studio reference",
+      "filename": "host_visual_concept_r03.png"
+    }
+  ],
+  "notes": "User reference controls face and center-parted long natural waves; r03 controls charcoal blazer, ivory top, and warm interview studio. AI-generated fictional host concept. Pending director review.",
+  "prompt": "Use case: photorealistic-natural\nAsset type: 访谈节目 AI 主持人定妆候选，供导演审阅\n输入图像：图1是脸型、五官和发型的主要参考；严格沿用图1女性的脸部轮廓、眼型、鼻梁、唇形与自然气质，以及深色中分长发和松散自然的大波浪结构。图2只参考主持人服装和暖色调访谈演播室氛围，不沿用图2的直发发型。\n场景：与图2一致的真实访谈演播室，暖色木质背景柔和虚化；无文字、无标识。\n主体：生成一位原创的虚构成年女性访谈主持人，脸部高度贴近图1参考；穿图2中的深炭灰西装外套与象牙白上衣，优雅、聪明、自然亲和。\n视觉风格与材质：真实相机拍摄的人像，真实皮肤细节和轻微自然瑕疵；极度逼真的黑色头发，能看到真实发丝与自然层次，发根为自然深棕黑，少量柔和棕色反光；禁止塑料头发、CGI、3D 渲染、过度磨皮。\n构图：4:5 竖版，正面至轻微三分之四角度的胸像，面部和发型清晰完整，头顶与长发轮廓留足空间；视线略偏镜头左侧，适合作为稳定的访谈主持人身份参考。\n灯光与氛围：柔和的大型影视柔光箱主光，温暖轮廓光，电影感但不过度戏剧化，肤色自然。\n约束：图1控制脸和发型；图2仅控制服装与棚景。保留中分、头顶自然蓬松、两侧贴脸的长波浪、长度至胸下的发丝轮廓。表情沉稳亲切，双手不入镜。该图是 AI 生成的虚构主持人概念，不得呈现为参考人物的真实照片或代言。不要耳机、不要麦克风遮挡脸、不要文字、不要水印、不要拼贴或多视图。",
+  "approved_by": "项目所有者",
+  "approved_on": "2026-09-23",
+  "formal_reference": "episodes/EP0001_golden_clip/02_refs/host_identity.png"
+}

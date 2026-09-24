@@ -12,6 +12,7 @@ from .hashing import sha256_file
 from .manifest import find_shot, load_manifest
 from .media import duration
 from .prompt import validate_prompt
+from .state import budget_snapshot
 
 
 def _episode_file(root: Path, value: str, label: str) -> Path:
@@ -41,7 +42,9 @@ def _copy_spec(episode_root: Path, shot: dict[str, Any]) -> tuple[list[tuple[str
     for source_key, target_key in mapping:
         values = shot["references"].get(source_key, [])
         if source_key == "audios" and isinstance(shot.get("master_audio"), str):
-            values = [shot["master_audio"]]
+            # A short dialogue master may need trailing silence to meet Ref2VA's
+            # minimum reference length. Keep the timing authority unchanged.
+            values = [shot.get("h3_reference_audio") or shot["master_audio"]]
         for index, value in enumerate(values, start=1):
             source = _episode_file(episode_root, value, f"references.{source_key}[{index - 1}]")
             suffix = source.suffix.lower()
@@ -83,8 +86,8 @@ def package_h3(manifest_path: str | Path, shot_id: str) -> Path:
     episode_root = manifest_path.parent
     manifest = load_manifest(manifest_path)
     shot = find_shot(manifest, shot_id)
-    if shot["status"] != "READY_FOR_H3":
-        raise ValueError(f"{shot_id} must be READY_FOR_H3 before packaging")
+    if shot["status"] not in {"READY_FOR_H3", "NEEDS_RETRY"}:
+        raise ValueError(f"{shot_id} must be READY_FOR_H3 or NEEDS_RETRY before packaging")
     prompt_path = _episode_file(episode_root, shot.get("prompt", ""), "prompt")
     prompt = prompt_path.read_text(encoding="utf-8")
     beat_text = [beat["text"] for beat in manifest["beats"] if beat["id"] in shot.get("beat_ids", [])]
@@ -182,7 +185,19 @@ def package_voice(manifest_path: str | Path) -> Path:
             "shot_id": beat_shots.get(beat["id"], {}).get("id"),
             "pause_after": float(beat.get("pause_after", 0)),
         })
-    revision = int(manifest.get("voice_job_revision", 1))
+    if "voice_job_revision" in manifest:
+        revision = int(manifest["voice_job_revision"])
+    else:
+        history = manifest.get("voice_jobs", {})
+        parsed = []
+        if isinstance(history, dict):
+            for previous_id, previous in history.items():
+                match = re.search(r"_voice_r(\d+)$", str(previous_id))
+                if match:
+                    parsed.append((int(match.group(1)), str(previous.get("status", "")).upper() if isinstance(previous, dict) else ""))
+        latest_revision = max((revision for revision, _ in parsed), default=1)
+        latest_status = next((status for revision, status in parsed if revision == latest_revision), "")
+        revision = latest_revision + int(latest_status in {"FAILED", "ERROR", "NEEDS_MANUAL_REVIEW"})
     job_id = f"{manifest['episode_id']}_voice_r{revision:02d}"
     job = {
         "schema_version": "ai-interview-voice-v1",
@@ -196,13 +211,10 @@ def package_voice(manifest_path: str | Path) -> Path:
         "input_sha256": {relative: sha256_file(source) for relative, source in files},
     }
     limits = manifest["retry_policy"]
-    used_episode = sum(float(item.get("runtime", {}).get("gpu_minutes", 0.0)) for item in manifest["shots"])
+    snapshot = budget_snapshot(manifest)
     job["budget"] = {
-        "remaining_gpu_minutes_per_episode": max(0.0, float(limits["max_gpu_minutes_per_episode"]) - used_episode),
-        "remaining_gpu_minutes_by_shot": {
-            shot["id"]: max(0.0, float(limits["max_gpu_minutes_per_shot"]) - float(shot.get("runtime", {}).get("gpu_minutes", 0.0)))
-            for shot in manifest["shots"]
-        },
+        "remaining_gpu_minutes_per_episode": snapshot["gpu_minutes_available"],
+        "remaining_gpu_minutes_by_shot": {shot_id: values["gpu_minutes_available"] for shot_id, values in snapshot["shots"].items()},
     }
     destination = episode_root / "voice_jobs" / job_id
     if destination.exists():
@@ -249,10 +261,27 @@ def package_voice_design(manifest_path: str | Path, character_id: str, candidate
     if language not in {"Chinese", "English", "Japanese", "Korean", "German", "French", "Russian", "Portuguese", "Spanish", "Italian"}:
         raise ValueError("voice_design.language is unsupported by Qwen3-TTS")
     revision = int(character.get("voice_design_revision", 1))
+    if "voice_design_revision" not in character:
+        history = manifest.get("voice_design_jobs", {})
+        parsed = []
+        if isinstance(history, dict):
+            for previous_id, previous in history.items():
+                match = re.search(r"_design_r(\d+)$", str(previous_id))
+                if match and isinstance(previous, dict) and previous.get("character_id") == character_id:
+                    parsed.append((int(match.group(1)), str(previous.get("status", "")).upper()))
+        latest_revision = max((item[0] for item in parsed), default=revision)
+        latest_status = next((status for rev, status in parsed if rev == latest_revision), "")
+        revision = latest_revision + int(latest_status in {"FAILED", "ERROR", "NEEDS_MANUAL_REVIEW"})
     job_id = f"{manifest['episode_id']}_{character['voice_id']}_design_r{revision:02d}"
     budget_limit = float(manifest.get("voice_design_budget_minutes", 15.0))
-    spent = sum(float(item.get("gpu_minutes", 0.0)) for item in manifest.get("voice_design_jobs", {}).values())
-    remaining = max(0.0, budget_limit - spent)
+    design_jobs = manifest.get("voice_design_jobs", {})
+    active_states = {"RESERVED", "SUBMITTED", "QUEUED", "RUNNING", "INTERRUPTED"}
+    spent = sum(float(item.get("gpu_minutes", 0.0)) for item in design_jobs.values() if isinstance(item, dict))
+    reserved = sum(
+        float(item.get("reserved_gpu_minutes", 0.0)) for item in design_jobs.values()
+        if isinstance(item, dict) and str(item.get("remote_status", item.get("status", ""))).upper() in active_states
+    )
+    remaining = max(0.0, budget_limit - spent - reserved)
     if remaining <= 0:
         raise ValueError("voice-design GPU budget is exhausted; manual review or a new authorized budget revision is required")
     job = {

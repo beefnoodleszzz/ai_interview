@@ -1,0 +1,10 @@
+{
+  "status": "PENDING_DIRECTOR_REVIEW",
+  "role": "studio_guest candidate for S001 and S004",
+  "path": "guest_closeup_r01.png",
+  "sha256": "d6eb1afb6cf6058d82691ccfade5043d2782f47e92c1d02eaab26ff19182e3df",
+  "dimensions": [941, 1672],
+  "source_guest_visual": "../../../../characters/guest_v001/reference_candidates/guest_visual_concept_r01.png",
+  "source_studio_visual": "../../../../sets/studio_v001/reference_candidates/studio_wide_concept_r01.png",
+  "review_notes": "Check guest facial identity, headphones, rightward eyeline, readable mouth, microphone and warm walnut/charcoal studio geometry."
+}

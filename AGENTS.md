@@ -15,6 +15,10 @@ Optimization order:
 5. lip sync and local visual quality
 6. repeatability, cost, and speed
 
+For end-to-end episode production or resuming an episode, use the project skill
+`.agents/skills/ai-interview-production/SKILL.md`. This file remains the
+authority for production boundaries and gates.
+
 ## Sources of Truth
 
 - `episodes/<episode_id>/episode.yaml` is the canonical episode state.

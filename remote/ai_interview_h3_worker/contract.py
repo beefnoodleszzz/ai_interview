@@ -40,7 +40,7 @@ def _asset_path(value: Any, label: str) -> str:
     return value
 
 
-def validate_job_directory(directory: Path) -> dict[str, Any]:
+def validate_job_directory(directory: Path, *, allow_upload_name: bool = False) -> dict[str, Any]:
     if directory.is_symlink() or not directory.is_dir():
         raise ValueError("job directory must be a real directory")
     job_file = directory / "job.json"
@@ -52,7 +52,7 @@ def validate_job_directory(directory: Path) -> dict[str, Any]:
     if job.get("schema_version") != PROTOCOL:
         raise ValueError(f"schema_version must be {PROTOCOL}")
     safe_job_id(job.get("job_id"))
-    if directory.name != job["job_id"]:
+    if directory.name != job["job_id"] and not allow_upload_name:
         raise ValueError("job directory name must equal job_id")
     if not isinstance(job.get("episode_id"), str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,79}", job["episode_id"]):
         raise ValueError("episode_id is invalid")
@@ -71,8 +71,11 @@ def validate_job_directory(directory: Path) -> dict[str, Any]:
         if not isinstance(amount, (int, float)) or isinstance(amount, bool) or amount < 0:
             raise ValueError(f"budget.{field} must be a non-negative number")
     duration = job.get("duration_sec")
-    if not isinstance(duration, (int, float)) or isinstance(duration, bool) or not 0 < duration <= 30:
-        raise ValueError("duration_sec must be greater than 0 and at most 30")
+    if not isinstance(duration, (int, float)) or isinstance(duration, bool):
+        raise ValueError("duration_sec must be a number")
+    frames = round(float(duration) * 24)
+    if not 124 <= frames <= 345 or frames % 17 != 5 or abs(float(duration) - frames / 24) > 0.001:
+        raise ValueError("duration_sec must map to a valid 124-345 H3 frame count at 24 fps (17k+5)")
     if job.get("aspect_ratio") not in {"9:16", "16:9", "1:1"}:
         raise ValueError("unsupported aspect_ratio")
     if not isinstance(job.get("prompt"), str) or not job["prompt"].strip():

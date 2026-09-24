@@ -1,0 +1,22 @@
+subject_definitions:
+<Subject 1> is the adult Chinese female host defined by <Picture 1>, with long center-parted dark-brown hair falling in natural loose waves below her chest, natural skin, a charcoal blazer, an ivory shirt, and a restrained skeptical expression.
+<Subject 2> is the fixed interview studio defined by <Picture 2>, with charcoal acoustic panels, walnut table and slats, warm practical lamps, and a black boom microphone. The host sits on camera-right and looks camera-left toward the unseen guest.
+<Audio 1> is the selected 48 kHz Mandarin Dialogue Master for <Subject 1> (S2), carrying the exact brief question and its timing.
+
+summary:
+[reference generation + audio reuse] A single host close-up keeps <Subject 1> in <Subject 2> and uses <Audio 1> as the exact short follow-up after the guest's startling opening.
+
+retention_analysis:
+<Subject 1> (appears in [Shot 1]): fully_preserved - retain her face, hair, clothing, understated expression, and look direction.
+<Subject 2> (appears in [Shot 1]): fully_preserved - retain the studio axis, microphone, walnut and charcoal surfaces, and warm light.
+<Audio 1>: fully_copy - the supplied dialogue signal provides the complete spoken words, breath, and pause.
+
+detailed_description:
+The target is a 5.17-second realistic live-action podcast close-up in a vertical frame with a stable camera and natural facial motion.
+[Shot 1] <Subject 1> is seated on camera-right in <Subject 2>, framed chest-up at eye level. The black boom microphone remains at the lower-left edge and never hides her mouth. She looks toward the guest on camera-left, taking in his previous statement with a small eyebrow lift. <Subject 1> (S2) gives a compact, incredulous follow-up in exact synchronization with <Audio 1>: <d>[Chinese] 本来？</d> Her delivery is quiet and sharply focused, with a slight questioning rise rather than presenter emphasis. Her lips and jaw follow the supplied audio, then close immediately. She holds the guest's gaze and lets the silence register; shoulders and hands remain still. No new smile, direct-to-camera delivery, extra speech, subtitles, visible text, or narration.
+
+overall_soundscape:
+An unobtrusive steady studio room tone under the short spoken line and the following silence. No audience reaction. No narration.
+
+non_diegetic_music:
+N/A

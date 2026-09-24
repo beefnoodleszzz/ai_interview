@@ -29,6 +29,14 @@ def _now() -> str:
     return datetime.now(UTC).isoformat()
 
 
+def _queue_lock():
+    path = RUNTIME / "voice_design" / "jobs" / ".queue.lock"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lock = path.open("a+", encoding="utf-8")
+    fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+    return lock
+
+
 def _sha(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -123,7 +131,7 @@ def _run(job_dir: Path) -> dict[str, Any]:
             if elapsed_minutes >= float(job["budget"]["remaining_gpu_minutes_per_episode"]):
                 state.update({"status": "NEEDS_MANUAL_REVIEW", "stage": "budget", "gpu_minutes": round(elapsed_minutes, 3), "updated_at": _now()})
                 _write(state_file, state)
-                return {"schema_version": PROTOCOL, "job_id": job_id, "status": "NEEDS_MANUAL_REVIEW", "candidates": candidates}
+                return _manual_review_result(job_id, candidates, elapsed_minutes)
             name = f"{job['voice_id']}_candidate_{index:02d}.wav"
             output = result_dir / name
             if output.exists():
@@ -169,6 +177,13 @@ def _run(job_dir: Path) -> dict[str, Any]:
         raise
 
 
+def _manual_review_result(job_id: str, candidates: list[dict[str, Any]], elapsed_minutes: float) -> dict[str, Any]:
+    return {
+        "schema_version": PROTOCOL, "job_id": job_id, "status": "NEEDS_MANUAL_REVIEW",
+        "gpu_minutes": round(elapsed_minutes, 3), "candidates": candidates,
+    }
+
+
 def _status(job_id: str | None = None, episode_id: str | None = None) -> dict[str, Any]:
     jobs = []
     base = RUNTIME / "voice_design" / "jobs"
@@ -184,11 +199,51 @@ def _status(job_id: str | None = None, episode_id: str | None = None) -> dict[st
             result = json.loads((child / "result.json").read_text(encoding="utf-8")) if (child / "result.json").is_file() else {}
             if episode_id and request.get("episode_id", result.get("episode_id")) != episode_id:
                 continue
-            jobs.append({"job_id": child.name, "episode_id": request.get("episode_id", result.get("episode_id")), "status": state.get("status") or {"inbox": "QUEUED", "running": "RUNNING", "complete": "COMPLETE", "failed": "FAILED"}[state_name], "gpu_minutes": state.get("gpu_minutes", result.get("gpu_minutes", 0.0)), "stage": state.get("stage"), "error": state.get("error")})
+            request_file = child / "job.json"
+            jobs.append({"job_id": child.name, "episode_id": request.get("episode_id", result.get("episode_id")),
+                         "status": state.get("status") or {"inbox": "QUEUED", "running": "RUNNING", "complete": "COMPLETE", "failed": "FAILED"}[state_name],
+                         "location": state_name, "request_sha256": _sha(request_file) if request_file.is_file() else None,
+                         "gpu_minutes": state.get("gpu_minutes", result.get("gpu_minutes", 0.0)), "stage": state.get("stage"), "error": state.get("error")})
     return {"schema_version": PROTOCOL, "jobs": jobs}
 
 
+def _doctor() -> dict[str, Any]:
+    model_files = {
+        "config": QWEN_MODEL / "config.json",
+        "model": QWEN_MODEL / "model.safetensors",
+        "speech_tokenizer": QWEN_MODEL / "speech_tokenizer/model.safetensors",
+    }
+    checks = {name: "PASS" if path.is_file() and path.stat().st_size > 0 else "FAIL" for name, path in model_files.items()}
+    checks["python"] = "PASS" if Path(QWEN_PYTHON).is_file() else "FAIL"
+    checks["application"] = "PASS" if QWEN_ROOT.is_dir() else "FAIL"
+    if checks["python"] == "PASS" and checks["application"] == "PASS":
+        try:
+            imported = subprocess.run(
+                [QWEN_PYTHON, "-c", "import torch; import soundfile; from qwen_tts import Qwen3TTSModel; print(int(torch.cuda.is_available()))"],
+                cwd=QWEN_ROOT, capture_output=True, text=True, timeout=90, check=False,
+            )
+            checks["runtime"] = "PASS" if imported.returncode == 0 and imported.stdout.strip()[-1:] in {"0", "1"} else "FAIL"
+            cuda_ready = imported.returncode == 0 and imported.stdout.strip().endswith("1")
+        except (OSError, subprocess.TimeoutExpired):
+            checks["runtime"] = "FAIL"
+            cuda_ready = False
+    else:
+        checks["runtime"] = "FAIL"
+        cuda_ready = False
+    status = "FAIL" if "FAIL" in checks.values() else "READY" if cuda_ready else "CONFIGURED_NO_GPU"
+    return {"schema_version": PROTOCOL, "backend": "Qwen3-TTS-VoiceDesign", "status": status, "checks": checks}
+
+
 def _submit(job_dir: Path) -> dict[str, Any]:
+    lock = _queue_lock()
+    try:
+        return _submit_locked(job_dir)
+    finally:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+        lock.close()
+
+
+def _submit_locked(job_dir: Path) -> dict[str, Any]:
     job = validate_job(job_dir)
     job_id = job["job_id"]
     inbox = RUNTIME / "voice_design" / "jobs" / "inbox" / job_id
@@ -213,13 +268,15 @@ def _submit(job_dir: Path) -> dict[str, Any]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     commands = parser.add_subparsers(dest="command", required=True)
+    doctor = commands.add_parser("doctor"); doctor.add_argument("--json", action="store_true")
     submit = commands.add_parser("submit"); submit.add_argument("--job-dir", required=True)
     status = commands.add_parser("status"); status.add_argument("--job-id"); status.add_argument("--episode-id")
     run = commands.add_parser("run"); run.add_argument("--job-dir", required=True)
     for command in (submit, status, run): command.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
     try:
-        if args.command == "submit": result = _submit(Path(args.job_dir).resolve())
+        if args.command == "doctor": result = _doctor()
+        elif args.command == "submit": result = _submit(Path(args.job_dir).resolve())
         elif args.command == "status": result = _status(args.job_id, args.episode_id)
         else:
             with (RUNTIME / "jobs" / ".gpu.lock").open("w", encoding="utf-8") as lock:

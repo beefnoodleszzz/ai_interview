@@ -2,9 +2,10 @@
 
 - 项目：AI 原生访谈 / 对谈视频生产系统
 - 需求基线：v1.1（2026-09-22）
-- 当前阶段：本地控制面主链路已实现；AutoDL H3/Voice/ASR 环境已部署；黄金片段资产处于人工审核前
-- 当前 Gate：冻结经人工审核的声线/视觉参考，完成真实 IndexTTS→ASR job，再生产并审核 15–20 秒黄金片段
-- 当前 Episode：`EP0001_golden_clip` 模板骨架已定义，视觉/声音候选仍未批准
+- 当前阶段：`EP0001_golden_clip` 的 15.8 秒 1080×1920 单层字幕候选片 v3 已完成；S003“本来？”的 0.48 秒画面取入误差已修正，48 kHz 音频未改，Final QC 通过。
+- 当前 Gate：所有者已于 2026-09-25 确认 v3 黄金片段可以通过；确定性 Final QC 为 PASS。正式 `approve-final` 的逐项 Checklist、手机端证据和异地备份仍分别留证，70–100 秒完整集尚未启动。
+- AutoDL：本轮新实例 `c40c4b807c-9daa1942` 已于 2026-09-25 在控制台确认“已关机”。
+- 候选片、字幕、QC 与 SHA-256 见 [`REVIEW_STATUS.md`](../episodes/EP0001_golden_clip/09_final/REVIEW_STATUS.md)。
 
 ## 已冻结技术路线
 
@@ -36,8 +37,4 @@
 
 ## 下一步
 
-不要启动 70–100 秒完整集。先让项目所有者试听并冻结声音候选、让导演审核
-`characters/` 与 `sets/` 下的视觉候选，再完成项目级 IndexTTS/ASR 实测和真实
-15–20 秒 H3 黄金片段。LatentSync/SeedVR2 调度、异地备份恢复与 OSS 对象核对
-仍需单独完成。详见
-[`READINESS_AUDIT_2026-09-23.md`](reports/READINESS_AUDIT_2026-09-23.md)。
+先对已交付的候选片完成逐项视听验收并记录导演结论；通过后才开放完整集。异地备份恢复证明及可选后处理 GPU Smoke 仍待独立验收。

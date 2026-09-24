@@ -1,0 +1,16 @@
+{
+  "schema_version": "ai-interview-voice-v1",
+  "job_id": "EP0001_golden_clip_voice_r02",
+  "line_id": "B03",
+  "candidate_id": "EP0001_golden_clip_voice_r02_B03_candidate_02",
+  "filename": "B03_candidate_02.wav",
+  "sha256": "2a2c1484d76e2bc6394600cd10d8d5091b6ae9d27556ea0ef7361137be7aa266",
+  "text": "后来领导开始刷你们短视频了。",
+  "asr_text": "后来领导开时杀你们短视频了",
+  "voice_id": "guest_voice_v001",
+  "emotion": "deadpan",
+  "generation_seconds": 3.111,
+  "duration_sec": 3.343673,
+  "sample_rate": 22050,
+  "channels": 1
+}

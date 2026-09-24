@@ -1,0 +1,90 @@
+{
+  "status": "PENDING_DIRECTOR_REVIEW",
+  "source_host_visual": "../host_identity.png",
+  "source_studio_visual": "../../../../sets/studio_v001/reference_candidates/studio_wide_concept_r01.png",
+  "assets": [
+    {
+      "role": "S002 first_frame candidate",
+      "path": "host_reaction_start_r01.png",
+      "sha256": "63366fa420b6cd6335d699fbd4689bb6d7cb4db0e29666b07b88099fa8953934",
+      "dimensions": [
+        940,
+        1672
+      ],
+      "review_notes": "Host visual identity, camera-left gaze, closed lips, microphone/studio continuity; verify against the original Host and Studio candidates."
+    },
+    {
+      "role": "S002 last_frame candidate",
+      "path": "host_reaction_end_r01.png",
+      "sha256": "94d90155721480f9a966ccfed009ba5b548e0c15e0335880ff2f082d62c88fbf",
+      "dimensions": [
+        940,
+        1673
+      ],
+      "review_notes": "Subtle raised eyebrow and restrained almost-smile with lips closed; verify same identity, composition, and continuity. One-pixel height difference must be resolved before promoting as FL2VA keyframes."
+    },
+    {
+      "role": "S002 first_frame candidate",
+      "path": "host_reaction_start_r03.png",
+      "sha256": "a79ea3a52d04d374ba98d698d64ae7af6e9b886bc7eaa7a62013471a5c283599",
+      "dimensions": [
+        941,
+        1672
+      ],
+      "review_notes": "与主持人演播室近景过于相似；保留历史版本，不进入导演当前候选。",
+      "status": "SUPERSEDED_NEAR_IDENTICAL_TO_HOST_CLOSEUP"
+    },
+    {
+      "role": "S002 last_frame candidate",
+      "path": "host_reaction_end_r02.png",
+      "sha256": "32edc29413bed34632e0717b72d76b86fc74684a766c6ff8fc28c72bba505b97",
+      "dimensions": [
+        941,
+        1672
+      ],
+      "review_notes": "与起始帧/主持人演播室近景变化不可读；保留历史版本，不进入导演当前候选。",
+      "status": "SUPERSEDED_NEAR_IDENTICAL_TO_START_R03"
+    },
+    {
+      "role": "S002 first_frame candidate; tighter reaction close-up",
+      "path": "host_reaction_start_r04.png",
+      "sha256": "ccb28619483e7f6d899c3213f55c4c00ed1dd7170892334b18d1c5de80bc8590",
+      "dimensions": [
+        941,
+        1672
+      ],
+      "status": "APPROVED_BY_PROJECT_OWNER",
+      "review_notes": "Tighter head-and-shoulders close-up than host dialogue shot; neutral attentive expression, lips closed; review match with end r03.",
+      "approved_by": "项目所有者",
+      "approved_on": "2026-09-23",
+      "formal_reference": "../host_reaction_start.png"
+    },
+    {
+      "role": "S002 last_frame candidate; readable restrained reaction",
+      "path": "host_reaction_end_r03.png",
+      "sha256": "a52a6ae38e86af8c3c813bbbd659db864ef2e1b4a4d2b540e4ba155e8a155db4",
+      "dimensions": [
+        941,
+        1672
+      ],
+      "status": "SUPERSEDED_REACTION_TOO_SUBTLE",
+      "review_notes": "上一版表情变化偏弱；保留历史版本。"
+    },
+    {
+      "role": "S002 last_frame candidate; readable restrained reaction",
+      "path": "host_reaction_end_r04.png",
+      "sha256": "49469f3466dbc47a46c107411c0fda4ce039ffccf80691f66d6ae3ffd7d946cc",
+      "dimensions": [
+        941,
+        1672
+      ],
+      "status": "APPROVED_BY_PROJECT_OWNER",
+      "review_notes": "Independent generation to make the reaction legible: clear asymmetrical raised brow and closed-lip smirk; verify it still matches the approved Host face/hair and start r04 crop.",
+      "approved_by": "项目所有者",
+      "approved_on": "2026-09-23",
+      "formal_reference": "../host_reaction_end.png"
+    }
+  ],
+  "legacy_source_host_visual": "../../../../characters/host_v001/reference_candidates/host_visual_concept_r01.png",
+  "review_notes": "当前审核对：host_reaction_start_r04.png 与 host_reaction_end_r04.png。起始为紧面部特写的专注聆听；结束为清楚可辨的单侧抬眉与闭嘴压笑。旧版本已标记作废并保留，不进入当前审核。 项目所有者于 2026-09-23 批准 start_r04/end_r04；已升级为正式 S002 首尾帧。"
+}

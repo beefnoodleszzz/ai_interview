@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import shlex
 import subprocess
@@ -13,10 +14,12 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "orchestrator"))
-from ai_interview.remote import _scp, _ssh, load_remote_config, resolve_connection
+from ai_interview.remote import _ssh, load_remote_config, resolve_connection
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.parse_args(argv)
     project = Path(__file__).resolve().parents[1]
     config = load_remote_config(project)
     connection = resolve_connection(config)
@@ -26,6 +29,7 @@ def main() -> int:
         (project / "remote" / "voice_worker.py", "worker/voice_worker.py"),
         (project / "remote" / "voice_asr.py", "worker/voice_asr.py"),
         (project / "remote" / "voice_design_worker.py", "worker/voice_design_worker.py"),
+        (project / "remote" / "postprocess_worker.py", "worker/postprocess_worker.py"),
     ]
     mappings.extend((path, f"worker/ai_interview_h3_worker/{path.name}") for path in sorted((project / "remote" / "ai_interview_h3_worker").glob("*.py")))
     mappings.extend((path, f"workflows/{path.name}") for path in sorted((project / "remote" / "workflows").glob("*.json")))
@@ -41,9 +45,27 @@ def main() -> int:
                 bundle.add(source, arcname=f"payload/{index}")
         digest = hashlib.sha256(archive.read_bytes()).hexdigest()
         upload_path = f"{root}/worker/.upload-{stamp}.tar.gz"
-        upload = subprocess.run([*_scp(connection), str(archive), f"{connection['target']}:{upload_path}"], capture_output=True, text=True, timeout=300, check=False)
+        # Some AutoDL SSH gateways accept command sessions but close the legacy
+        # SCP subsystem mid-transfer. Stream the small, hashed deployment
+        # archive through the already configured SSH command channel instead.
+        try:
+            upload = subprocess.run(
+                _ssh(connection, f"cat > {shlex.quote(upload_path)}"),
+                input=archive.read_bytes(), capture_output=True, timeout=300, check=False,
+            )
+        except subprocess.TimeoutExpired as exc:
+            try:
+                subprocess.run(_ssh(connection, f"rm -f -- {shlex.quote(upload_path)}"), capture_output=True, timeout=30, check=False)
+            except (OSError, subprocess.TimeoutExpired):
+                pass
+            raise RuntimeError("worker package upload timed out; attempted to remove its partial archive") from exc
         if upload.returncode:
-            raise RuntimeError(upload.stderr.strip()[-1500:] or "worker package upload failed")
+            try:
+                subprocess.run(_ssh(connection, f"rm -f -- {shlex.quote(upload_path)}"), capture_output=True, timeout=30, check=False)
+            except (OSError, subprocess.TimeoutExpired):
+                pass
+            detail = upload.stderr.decode(errors="replace")[-1500:] if upload.stderr else "worker package upload failed"
+            raise RuntimeError(detail)
         source_map = ",\n".join(f"    ({index}, {destination!r})" for index, (_, destination) in enumerate(mappings))
         remote_script = f'''import hashlib, os, pathlib, shutil, sys, tarfile, tempfile
 archive = pathlib.Path(sys.argv[1]); root = pathlib.Path(sys.argv[2]); backup = root / "worker" / "backups" / "deploy-{stamp}"

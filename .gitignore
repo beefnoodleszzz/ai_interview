@@ -22,6 +22,9 @@ episodes/*/remote_results/
 episodes/*/voice_jobs/
 episodes/*/voice_design_jobs/
 episodes/*/voice_design_results/
+episodes/*/postprocess_jobs/
+episodes/*/postprocess_results/
+episodes/*/.episode.yaml.lock
 *.wav
 *.mp3
 *.mp4
@@ -35,3 +38,5 @@ episodes/*/voice_design_results/
 # Local-generated visual references are candidates and must not be committed as media.
 characters/*/reference_candidates/*.png
 sets/*/reference_candidates/*.png
+episodes/*/02_refs/reaction_candidates/*.png
+episodes/*/02_refs/studio_candidates/*.png

@@ -31,6 +31,14 @@ def _now() -> str:
     return datetime.now(UTC).isoformat()
 
 
+def _queue_lock():
+    path = RUNTIME / "voice" / "jobs" / ".queue.lock"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lock = path.open("a+", encoding="utf-8")
+    fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+    return lock
+
+
 def _sha(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -175,7 +183,7 @@ def _run(job_dir: Path) -> dict[str, Any]:
             if used_episode >= episode_budget or used_shot >= line_budget:
                 state.update({"status": "NEEDS_MANUAL_REVIEW", "stage": "budget", "gpu_minutes": round(used_episode, 3), "updated_at": _now()})
                 _write(state_file, state)
-                return {"schema_version": PROTOCOL, "job_id": job_id, "status": "NEEDS_MANUAL_REVIEW", "lines": candidates}
+                return _manual_review_result(job_id, candidates, state, used_episode)
             reference = running / line["voice_reference"]
             for index in range(1, job["candidates_per_line"] + 1):
                 filename = f"{line['id']}_candidate_{index:02d}.wav"
@@ -228,6 +236,14 @@ def _run(job_dir: Path) -> dict[str, Any]:
         raise
 
 
+def _manual_review_result(job_id: str, candidates: list[dict[str, Any]], state: dict[str, Any], elapsed_minutes: float) -> dict[str, Any]:
+    return {
+        "schema_version": PROTOCOL, "job_id": job_id, "status": "NEEDS_MANUAL_REVIEW",
+        "lines": candidates, "gpu_minutes": round(elapsed_minutes, 3),
+        "gpu_minutes_by_shot": {key: round(float(value) / 60, 3) for key, value in state.get("gpu_seconds_by_shot", {}).items()},
+    }
+
+
 def _status(job_id: str | None = None, episode_id: str | None = None) -> dict[str, Any]:
     jobs = []
     base = RUNTIME / "voice" / "jobs"
@@ -246,11 +262,63 @@ def _status(job_id: str | None = None, episode_id: str | None = None) -> dict[st
                 continue
             status = state.get("status") or {"inbox": "QUEUED", "running": "RUNNING", "complete": "COMPLETE", "failed": "FAILED"}[name]
             by_shot = job.get("gpu_minutes_by_shot") or {key: round(float(value) / 60, 3) for key, value in state.get("gpu_seconds_by_shot", {}).items()}
-            jobs.append({"job_id": child.name, "episode_id": job.get("episode_id"), "status": status, "gpu_minutes": state.get("gpu_minutes", job.get("gpu_minutes", 0.0)), "gpu_minutes_by_shot": by_shot, "stage": state.get("stage"), "error": state.get("error")})
+            request_file = child / "job.json"
+            jobs.append({"job_id": child.name, "episode_id": job.get("episode_id"), "status": status, "location": name,
+                         "request_sha256": _sha(request_file) if request_file.is_file() else None,
+                         "gpu_minutes": state.get("gpu_minutes", job.get("gpu_minutes", 0.0)), "gpu_minutes_by_shot": by_shot, "stage": state.get("stage"), "error": state.get("error")})
     return {"schema_version": PROTOCOL, "jobs": jobs}
 
 
+def _doctor() -> dict[str, Any]:
+    model_files = {
+        "config": INDEX_MODEL / "config.yaml",
+        "gpt": INDEX_MODEL / "gpt.pth",
+        "codec": INDEX_MODEL / "codec.pth",
+        "s2mel": INDEX_MODEL / "s2mel.pth",
+        "bigvgan": INDEX_MODEL / "hf_cache/bigvgan/bigvgan_generator.pt",
+        "semantic_codec": INDEX_MODEL / "hf_cache/semantic_codec/model.safetensors",
+        "asr_model": ASR_MODEL,
+    }
+    checks = {name: "PASS" if path.is_file() and path.stat().st_size > 0 else "FAIL" for name, path in model_files.items()}
+    checks["index_python"] = "PASS" if Path(INDEX_PYTHON).is_file() else "FAIL"
+    checks["asr_python"] = "PASS" if Path(ASR_PYTHON).is_file() else "FAIL"
+    checks["ffmpeg"] = "PASS" if shutil.which("ffmpeg") and shutil.which("ffprobe") else "FAIL"
+    if checks["index_python"] == "PASS":
+        try:
+            imported = subprocess.run(
+                [INDEX_PYTHON, "-c", "import torch; from indextts.infer_v2_5 import IndexTTS2; print(int(torch.cuda.is_available()))"],
+                cwd=INDEX_ROOT, capture_output=True, text=True, timeout=90, check=False,
+            )
+            checks["index_runtime"] = "PASS" if imported.returncode == 0 and imported.stdout.strip()[-1:] in {"0", "1"} else "FAIL"
+            cuda_ready = imported.returncode == 0 and imported.stdout.strip().endswith("1")
+        except (OSError, subprocess.TimeoutExpired):
+            checks["index_runtime"] = "FAIL"
+            cuda_ready = False
+    else:
+        checks["index_runtime"] = "FAIL"
+        cuda_ready = False
+    if checks["asr_python"] == "PASS":
+        try:
+            asr = subprocess.run([ASR_PYTHON, "-c", "import whisper"], capture_output=True, text=True, timeout=60, check=False)
+            checks["asr_runtime"] = "PASS" if asr.returncode == 0 else "FAIL"
+        except (OSError, subprocess.TimeoutExpired):
+            checks["asr_runtime"] = "FAIL"
+    else:
+        checks["asr_runtime"] = "FAIL"
+    status = "FAIL" if "FAIL" in checks.values() else "READY" if cuda_ready else "CONFIGURED_NO_GPU"
+    return {"schema_version": PROTOCOL, "backend": "IndexTTS-2.5", "status": status, "checks": checks}
+
+
 def _submit(job_dir: Path) -> dict[str, Any]:
+    lock = _queue_lock()
+    try:
+        return _submit_locked(job_dir)
+    finally:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+        lock.close()
+
+
+def _submit_locked(job_dir: Path) -> dict[str, Any]:
     job = validate_job(job_dir)
     job_id = job["job_id"]
     inbox = RUNTIME / "voice" / "jobs" / "inbox" / job_id
@@ -274,6 +342,8 @@ def _submit(job_dir: Path) -> dict[str, Any]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     commands = parser.add_subparsers(dest="command", required=True)
+    doctor_parser = commands.add_parser("doctor")
+    doctor_parser.add_argument("--json", action="store_true")
     submit_parser = commands.add_parser("submit")
     submit_parser.add_argument("--job-dir", required=True)
     status_parser = commands.add_parser("status")
@@ -286,7 +356,9 @@ def main(argv: list[str] | None = None) -> int:
     run_parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
     try:
-        if args.command == "submit":
+        if args.command == "doctor":
+            result = _doctor()
+        elif args.command == "submit":
             result = _submit(Path(args.job_dir).resolve())
         elif args.command == "status":
             result = _status(args.job_id, args.episode_id)

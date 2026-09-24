@@ -1,0 +1,22 @@
+subject_definitions:
+<Subject 1> is the fictional extraterrestrial guest defined by <Picture 1>: the same olive-gray adult masculine face, readable humanlike lips, black over-ear headphones, and dark slate shirt as in his earlier close-up.
+<Subject 2> is the fixed interview studio defined by <Picture 2>: charcoal acoustic panels, warm walnut slats and table, practical amber light, and a black boom microphone. The guest stays on camera-left and looks camera-right toward the host.
+<Audio 1> is the selected 48 kHz Mandarin Dialogue Master for <Subject 1> (S1), with the exact spoken line and performance timing.
+
+summary:
+[reference generation + audio reuse] A single realistic guest close-up preserves <Subject 1> and <Subject 2> while <Audio 1> carries the deadpan explanation that reverses the opening premise.
+
+retention_analysis:
+<Subject 1> (appears in [Shot 1]): fully_preserved - keep the same facial identity, olive-gray skin, headphones, shirt, and readable lips.
+<Subject 2> (appears in [Shot 1]): fully_preserved - keep the same microphone, warm light, background geometry, and established screen direction.
+<Audio 1>: fully_copy - reuse the supplied dialogue and pauses as the exact timing authority, with only low native ambience added.
+
+detailed_description:
+The target is a 5.88-second realistic live-action podcast close-up in a vertical frame. It matches the guest's prior shot in color, lens height, camera axis, and microphone placement.
+[Shot 1] A static eye-level chest-up camera holds <Subject 1> on camera-left inside <Subject 2>. The microphone sits near the lower-right edge without covering his mouth. He keeps his gaze on the off-camera host to camera-right. After a short listening beat, <Subject 1> (S1) explains the reversal with the same dry, bureaucratically calm delivery, in exact synchronization with <Audio 1>: <d>[Chinese] 后来领导开始刷你们短视频了。</d> He makes only a minimal eye shift and small breath; his hands remain outside the frame. Lip and jaw movements follow the supplied consonants precisely, and he does not smile at his own absurd explanation. His mouth closes after the final word, leaving a quiet beat for the host's reply. Do not change his head shape, headphones, clothing, studio layout, or microphone. No extra dialogue, extra person, visible text, exaggerated gesture, or narration.
+
+overall_soundscape:
+Continuous quiet enclosed-studio room tone with a low ventilation bed. The ambience does not compete with the reference dialogue; no audience laugh. No narration.
+
+non_diegetic_music:
+N/A

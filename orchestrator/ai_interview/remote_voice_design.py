@@ -11,10 +11,18 @@ from pathlib import Path
 from typing import Any, Callable
 
 from .package import sha256_file
-from .remote import _scp, _ssh, _worker, load_remote_config, resolve_connection
+from .remote import _publish_remote_directory, _scp, _ssh, _worker, component_worker_doctor, load_remote_config, require_worker_ready, resolve_connection
 
 PROTOCOL = "ai-interview-voice-design-v1"
 SAFE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{2,119}$")
+
+
+def voice_design_worker_doctor(root: str | Path) -> dict[str, Any]:
+    return component_worker_doctor(root, "voice_design_worker.py", PROTOCOL)
+
+
+def _require_voice_design_ready(root: str | Path) -> dict[str, Any]:
+    return require_worker_ready(root, "voice_design_worker.py", PROTOCOL, "Qwen3-TTS VoiceDesign")
 
 
 def voice_design_status(root: str | Path, episode_id: str, job_id: str | None = None) -> dict[str, Any]:
@@ -27,7 +35,7 @@ def voice_design_status(root: str | Path, episode_id: str, job_id: str | None = 
     return _worker(config, connection, args, expected_schema=PROTOCOL, entrypoint="voice_design_worker.py")
 
 
-def submit_voice_design(package: str | Path, root: str | Path, on_submit: Callable[[], Any] | None = None) -> dict[str, Any]:
+def submit_voice_design(package: str | Path, root: str | Path, on_reserve: Callable[[dict[str, Any]], dict[str, Any]] | None = None) -> dict[str, Any]:
     package = Path(package).resolve()
     job_path = package / "job.json"
     if not package.is_dir() or not job_path.is_file():
@@ -41,7 +49,22 @@ def submit_voice_design(package: str | Path, root: str | Path, on_submit: Callab
     existing = voice_design_status(root, job["episode_id"], job_id)
     match = next((item for item in existing.get("jobs", []) if item.get("job_id") == job_id), None)
     if match:
+        if match.get("location") == "inbox":
+            if match.get("request_sha256") != sha256_file(job_path):
+                raise FileExistsError("remote VoiceDesign inbox job_id exists with a different package")
+            _require_voice_design_ready(root)
+            _apply_voice_design_reservation(job, job_path, on_reserve)
+            result = _worker(
+                config, connection,
+                ["submit", "--job-dir", f"{config['remote']['root']}/voice_design/jobs/inbox/{job_id}", "--json"],
+                expected_schema=PROTOCOL, entrypoint="voice_design_worker.py",
+            )
+            if result.get("job_id") != job_id:
+                raise RuntimeError("remote VoiceDesign inbox resume response job_id mismatch")
+            return result
         return {**match, "existing": True}
+    _require_voice_design_ready(root)
+    _apply_voice_design_reservation(job, job_path, on_reserve)
     base = f"{config['remote']['root']}/voice_design/jobs/inbox"
     destination = f"{base}/{job_id}"
     staging = f"{base}/.{job_id}.upload-{uuid.uuid4().hex}"
@@ -52,20 +75,38 @@ def submit_voice_design(package: str | Path, root: str | Path, on_submit: Callab
     if rsync:
         command = [rsync, "-az", "-e", f"ssh -p {connection['port']} -o BatchMode=yes", str(package) + "/", f"{connection['target']}:{staging}/"]
     else:
-        command = [*_scp(connection), "-r", str(package) + "/.", f"{connection['target']}:{staging}/"]
+        command = [*_scp(connection, legacy_protocol=True), "-r", str(package) + "/.", f"{connection['target']}:{staging}/"]
     transfer = subprocess.run(command, capture_output=True, text=True, timeout=300, check=False)
     if transfer.returncode:
         subprocess.run(_ssh(connection, f"rm -rf -- {shlex.quote(staging)}"), capture_output=True, text=True, timeout=30, check=False)
         raise RuntimeError(transfer.stderr.strip()[-2000:] or "VoiceDesign package upload failed")
-    publish = subprocess.run(_ssh(connection, f"if test -e {shlex.quote(destination)}; then exit 73; fi; mv {shlex.quote(staging)} {shlex.quote(destination)}"), capture_output=True, text=True, timeout=30, check=False)
-    if publish.returncode:
-        raise RuntimeError(publish.stderr.strip() or "VoiceDesign job already exists; refusing overwrite")
-    if on_submit:
-        on_submit()
+    _publish_remote_directory(
+        connection, staging, destination,
+        f"{config['remote']['root']}/voice_design/jobs/.queue.lock", "VoiceDesign",
+    )
     result = _worker(config, connection, ["submit", "--job-dir", destination, "--json"], expected_schema=PROTOCOL, entrypoint="voice_design_worker.py")
     if result.get("job_id") != job_id:
         raise RuntimeError("remote VoiceDesign response job_id mismatch")
     return result
+
+
+def _apply_voice_design_reservation(
+    job: dict[str, Any], job_path: Path,
+    on_reserve: Callable[[dict[str, Any]], dict[str, Any]] | None,
+) -> None:
+    if on_reserve is None:
+        raise RuntimeError("VoiceDesign submission requires an atomic local budget reservation")
+    reservation = on_reserve(job)
+    amount = float(reservation.get("remaining_gpu_minutes_per_episode", 0.0)) if isinstance(reservation, dict) else 0.0
+    if not 0 < amount <= 15:
+        raise ValueError("local VoiceDesign reservation must be within 0-15 GPU minutes")
+    budget = job.setdefault("budget", {})
+    if float(budget.get("remaining_gpu_minutes_per_episode", 0.0)) == amount:
+        return
+    budget["remaining_gpu_minutes_per_episode"] = amount
+    temporary = job_path.with_name(f".{job_path.name}.{uuid.uuid4().hex}.tmp")
+    temporary.write_text(json.dumps(job, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(job_path)
 
 
 def pull_voice_design(root: str | Path, job_id: str, destination: str | Path) -> Path:

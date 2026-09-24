@@ -1,6 +1,6 @@
 # 演播室 Studio Bible — studio_v001
 
-状态：固定空间候选 r01 待导演审核；不得当作已锁定制作场景。
+状态：固定空间候选 r01 已于 2026-09-24 获项目所有者批准；EP0001 正式参考为 `episodes/EP0001_golden_clip/02_refs/studio_wide.png`，来源和 SHA-256 见同名 JSON。
 
 ## 空间与连续性
 
@@ -13,5 +13,5 @@
 
 ## 当前空间候选
 
-- `reference_candidates/studio_wide_concept_r01.png` — 空场宽景候选；GPT-Image2 风格库 `Realistic Photography`（`realistic-photography`，case 377），按室内模板提示要求锁定视角、材质、光源和空间功能；待审。
-- 需要人类确认左右轴线、灯光和参考图与角色近景相容，再版本化冻结。
+- `reference_candidates/studio_wide_concept_r01.png` — 已批准的空场宽景候选；GPT-Image2 风格库 `Realistic Photography`（`realistic-photography`，case 377）。EP0001 的冻结副本见上方正式参考路径。
+- Guest 在画面左侧、Host 在画面右侧；静图审核已通过，生成镜头仍须检查实际轴线、灯光和近景连续性。

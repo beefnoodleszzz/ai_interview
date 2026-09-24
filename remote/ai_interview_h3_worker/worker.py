@@ -53,6 +53,14 @@ def _now() -> str:
     return datetime.now(UTC).isoformat()
 
 
+def _queue_lock():
+    path = RUNTIME / "jobs" / ".queue.lock"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lock = path.open("a+", encoding="utf-8")
+    fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+    return lock
+
+
 class BudgetPause(RuntimeError):
     pass
 
@@ -328,7 +336,13 @@ def _prepare_workflow(job: dict[str, Any], candidate_index: int, staged: dict[st
         elif node.get("class_type") == "VAELoader":
             field = "vae_name" if "vae_name" in node.get("inputs", {}) else ""
             if field:
-                node["inputs"][field] = Path(MODELS["video_vae"]).name
+                declared = node["inputs"][field]
+                if declared == Path(MODELS["audio_vae"]).name:
+                    node["inputs"][field] = Path(MODELS["audio_vae"]).name
+                elif declared == Path(MODELS["video_vae"]).name:
+                    node["inputs"][field] = Path(MODELS["video_vae"]).name
+                else:
+                    raise ValueError(f"unexpected H3 VAE in fixed workflow: {declared}")
         elif node.get("class_type") == "RandomNoise":
             node["inputs"]["noise_seed"] = seed
             node["inputs"]["noise_mode"] = "fixed"
@@ -390,6 +404,8 @@ def _candidate(job: dict[str, Any], index: int, client: ComfyClient, history: di
         "workflow": workflow_id,
         "workflow_id": workflow_id,
         "workflow_version": workflow_version,
+        "job_id": job["job_id"],
+        "shot_id": job["shot_id"],
         "candidate_id": candidate_id,
         "filename": video_name,
         "sha256": sha256_file(video_path),
@@ -557,7 +573,8 @@ def _status(job_id: str | None = None, episode_id: str | None = None, shot_id: s
         for child in sorted(directory.iterdir()):
             if not child.is_dir() or not JOB_RE.fullmatch(child.name) or (job_id and child.name != job_id):
                 continue
-            job_path = child / "job.json"
+            request_path = child / "job.json"
+            job_path = request_path
             if directory_state == "complete":
                 job_path = child / "result.json"
             if not job_path.is_file():
@@ -575,7 +592,10 @@ def _status(job_id: str | None = None, episode_id: str | None = None, shot_id: s
             status = state.get("status") or {"inbox": "QUEUED", "running": "QUEUED", "complete": "COMPLETE", "failed": "FAILED"}[directory_state]
             if directory_state == "running" and status == "RUNNING" and not _process_alive(state.get("pid")):
                 status = "INTERRUPTED"
-            entry = {"job_id": child.name, "episode_id": job.get("episode_id"), "shot_id": job.get("shot_id"), "status": status}
+            entry = {"job_id": child.name, "episode_id": job.get("episode_id"), "shot_id": job.get("shot_id"),
+                     "status": status, "location": directory_state}
+            if request_path.is_file():
+                entry["request_sha256"] = sha256_file(request_path)
             for field in ("stage", "error", "failure_class", "prompt_id", "gpu_minutes", "started_at", "updated_at", "candidate_index"):
                 if state.get(field, job.get(field)) is not None:
                     entry[field] = state.get(field, job.get(field))
@@ -583,21 +603,80 @@ def _status(job_id: str | None = None, episode_id: str | None = None, shot_id: s
     return {"schema_version": PROTOCOL, "jobs": result}
 
 
+def _same_job_request(left: Path, right: Path) -> bool:
+    left_file, right_file = left / "job.json", right / "job.json"
+    if left_file.is_symlink() or right_file.is_symlink() or not left_file.is_file() or not right_file.is_file():
+        return False
+    return json.loads(left_file.read_text(encoding="utf-8")) == json.loads(right_file.read_text(encoding="utf-8"))
+
+
+def _publish(staging: Path, job_id: str) -> dict[str, Any]:
+    job_id = safe_job_id(job_id)
+    inbox = RUNTIME / "jobs" / "inbox"
+    staging = staging.absolute()
+    if staging.is_symlink() or staging.parent.resolve() != inbox.resolve() or not staging.name.startswith(f".{job_id}.upload-"):
+        raise ValueError("publish requires a unique staging directory inside jobs/inbox")
+    staged_job = validate_job_directory(staging, allow_upload_name=True)
+    if staged_job["job_id"] != job_id:
+        raise ValueError("staged package job_id does not match publish request")
+    lock = _queue_lock()
+    try:
+        locations = [(name, RUNTIME / "jobs" / name / job_id)
+                     for name in ("inbox", "running", "complete", "failed")
+                     if (RUNTIME / "jobs" / name / job_id).exists() or (RUNTIME / "jobs" / name / job_id).is_symlink()]
+        if len(locations) > 1:
+            raise FileExistsError("job id exists in multiple state directories; preserving upload staging")
+        if locations:
+            state_name, existing = locations[0]
+            if not _same_job_request(existing, staging):
+                raise FileExistsError("job id already exists with a different package; preserving upload staging")
+            validate_job_directory(existing)
+            shutil.rmtree(staging)
+            match = next((item for item in _status(job_id, None, None)["jobs"] if item["job_id"] == job_id), None)
+            if match is None:
+                raise RuntimeError("existing H3 job became unreadable while publishing")
+            return {"schema_version": PROTOCOL, **match, "existing": True}
+        destination = inbox / job_id
+        if destination.exists() or destination.is_symlink():
+            raise FileExistsError("H3 inbox destination appeared during publish; preserving upload staging")
+        os.rename(staging, destination)
+        return {"schema_version": PROTOCOL, "job_id": job_id, "episode_id": staged_job["episode_id"],
+                "shot_id": staged_job["shot_id"], "status": "QUEUED", "location": "inbox", "existing": False}
+    finally:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+        lock.close()
+
+
 def _submit(job_dir: Path) -> dict[str, Any]:
-    job = validate_job_directory(job_dir)
-    job_id = job["job_id"]
+    lock = _queue_lock()
+    try:
+        return _submit_locked(job_dir)
+    finally:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+        lock.close()
+
+
+def _submit_locked(job_dir: Path) -> dict[str, Any]:
+    job_dir = job_dir.absolute()
+    job_id = safe_job_id(job_dir.name)
     inbox = RUNTIME / "jobs" / "inbox" / job_id
     running = RUNTIME / "jobs" / "running" / job_id
     complete = RUNTIME / "jobs" / "complete" / job_id
     failed = RUNTIME / "jobs" / "failed" / job_id
+    locations = [path for path in (inbox, running, complete, failed) if path.exists() or path.is_symlink()]
+    if len(locations) > 1:
+        raise FileExistsError("H3 job id exists in multiple state directories; preserving all copies")
     if complete.exists():
         return {"schema_version": PROTOCOL, "job_id": job_id, "status": "COMPLETE"}
     if running.exists() or failed.exists():
-        state = running / "state.json" if running.exists() else failed / "state.json"
+        state = (running if running.exists() else failed) / "state.json"
         value = json.loads(state.read_text()) if state.exists() else {}
         response = {"schema_version": PROTOCOL, "job_id": job_id, "status": value.get("status", "RUNNING")}
         response.update({key: value[key] for key in ("stage", "error", "failure_class", "prompt_id", "gpu_minutes", "started_at", "updated_at") if key in value})
         return response
+    job = validate_job_directory(job_dir)
+    if job["job_id"] != job_id:
+        raise ValueError("submit path does not match package job_id")
     if job_dir.resolve() != inbox.resolve():
         raise ValueError("submit path must be jobs/inbox/<job_id>")
     running.parent.mkdir(parents=True, exist_ok=True)
@@ -620,6 +699,15 @@ def _submit(job_dir: Path) -> dict[str, Any]:
 
 
 def _resume(job_id: str) -> dict[str, Any]:
+    lock = _queue_lock()
+    try:
+        return _resume_locked(job_id)
+    finally:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+        lock.close()
+
+
+def _resume_locked(job_id: str) -> dict[str, Any]:
     job_id = safe_job_id(job_id)
     running = RUNTIME / "jobs" / "running" / job_id
     complete = RUNTIME / "jobs" / "complete" / job_id
@@ -694,6 +782,10 @@ def main(argv: list[str] | None = None) -> int:
     submit_parser = subparsers.add_parser("submit")
     submit_parser.add_argument("--job-dir", required=True)
     submit_parser.add_argument("--json", action="store_true")
+    publish_parser = subparsers.add_parser("publish")
+    publish_parser.add_argument("--staging-dir", required=True)
+    publish_parser.add_argument("--job-id", required=True)
+    publish_parser.add_argument("--json", action="store_true")
     resume_parser = subparsers.add_parser("resume")
     resume_parser.add_argument("job_id")
     resume_parser.add_argument("--json", action="store_true")
@@ -719,6 +811,10 @@ def main(argv: list[str] | None = None) -> int:
             return 0 if result["status"] in {"READY", "CONFIGURED_NO_GPU"} else 2
         if args.command == "submit":
             result = _submit(Path(args.job_dir).resolve())
+            print(json.dumps(result, ensure_ascii=False))
+            return 0
+        if args.command == "publish":
+            result = _publish(Path(args.staging_dir), args.job_id)
             print(json.dumps(result, ensure_ascii=False))
             return 0
         if args.command == "resume":

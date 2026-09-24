@@ -1,0 +1,17 @@
+{
+  "status": "SUPERSEDED_NEAR_IDENTICAL_TO_HOST_CLOSEUP",
+  "role": "S002 last_frame candidate",
+  "path": "host_reaction_end_r02.png",
+  "sha256": "32edc29413bed34632e0717b72d76b86fc74684a766c6ff8fc28c72bba505b97",
+  "dimensions": [
+    941,
+    1672
+  ],
+  "source_host_reaction_start": "host_reaction_start_r03.png",
+  "source_host_visual": "../../../../characters/host_v001/reference_candidates/host_visual_concept_r04.png",
+  "generated_with": "built-in image_gen",
+  "style_template": "Realistic Photography (case 377)",
+  "review_notes": "上一版与Host演播室近景及起始/结束搭档视觉变化不足，保留历史记录，不作为当前候选。",
+  "prompt": "Use case: identity-preserve\nAsset type: S002 主持人静默反应镜头结束关键帧候选，与起始帧配对\n输入图像：图1是上一版结束帧，脸、表情方向、发型、姿势、机位、服装、背景、光线与麦克风位置均需保持；图2是起始帧，用于严格对齐身份和取景。\n只做一个修正：让人物双唇自然、轻柔地完全闭合，唇线接触，不露牙齿、不留缝隙。同时保留图1轻微抬起一侧眉毛和极克制的近乎不可见的笑意。\n其余严格保持不变：同一张脸、五官、头发、头部角度、眼线方向、眼睛睁开程度、表情强度、头肩姿势、取景、镜头透视、服装、项链、背景、麦克风、光线、曝光、颜色和景深。必须看起来是图2起始帧之后的后一瞬间，唯一可见变化是单侧眉毛略抬、嘴角极轻微收紧；嘴唇完整闭合。\n风格：自然写实摄影，真实皮肤和发丝，与图1保持一致。\n不要露齿、不要张嘴、不要改变身份或构图、不眨眼、不转头、不改变背景或麦克风，不添加任何元素，不要文字、水印、拼贴或多视图。",
+  "superseded_by": "host_reaction_end_r03.png"
+}

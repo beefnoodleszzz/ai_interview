@@ -1,0 +1,22 @@
+subject_definitions:
+<Subject 1> is the adult Chinese female host defined by <Picture 1>, with the same long center-parted dark-brown hair falling in natural loose waves below her chest, charcoal blazer, ivory shirt, natural skin, and controlled expression as in her earlier shots.
+<Subject 2> is the fixed interview studio defined by <Picture 2>, with charcoal acoustic panels, warm walnut table and slats, an amber practical light, and a black boom microphone. The host remains on camera-right and looks camera-left toward the guest.
+<Audio 1> is the selected 48 kHz Mandarin Dialogue Master for <Subject 1> (S2), including the deliberate hesitation and exact final question.
+
+summary:
+[reference generation + audio reuse] A single host close-up retains <Subject 1> and <Subject 2> while <Audio 1> supplies the restrained final question and its comic pause.
+
+retention_analysis:
+<Subject 1> (appears in [Shot 1]): fully_preserved - maintain facial identity, outfit, gaze direction, and dry restrained performance.
+<Subject 2> (appears in [Shot 1]): fully_preserved - maintain the studio geometry, microphone location, warm lighting, and camera axis.
+<Audio 1>: fully_copy - preserve the selected dialogue signal, especially the hesitation after the first word, as the exact spoken timing.
+
+detailed_description:
+The target is a 5.17-second realistic live-action podcast close-up in a vertical frame, matching the earlier host angle and lighting.
+[Shot 1] <Subject 1> sits on camera-right in <Subject 2>, chest-up at eye level, with the black boom microphone at the lower-left edge. She looks at the unseen guest to camera-left, processes his explanation for a small beat, and nearly smiles without losing her composure. <Subject 1> (S2) then asks in a dry conversational voice, matching the hesitation and exact timing of <Audio 1>: <d>[Chinese] 所以……是短视频救了地球？</d> The pause after “所以” is genuine thought, not a dramatic announcement. Her eyes remain on the guest; the mouth, jaw, and breath follow the supplied audio and close after the final syllable. She holds a tiny suppressed smile without laughing, leaving a clean end frame for a hard cut. The camera remains static; shoulders and hands barely move. No broad grin, presenter delivery, extra words, visible text, or narration.
+
+overall_soundscape:
+Quiet continuous podcast-studio room tone under the dialogue and the final held beat. No audience laugh or unrelated speech. No narration.
+
+non_diegetic_music:
+N/A

@@ -1,0 +1,15 @@
+{
+  "source": "remote_results/EP0001_golden_clip_S002_r02/candidate_01.mp4",
+  "source_sha256": "c0f226c54799da3add7ca77937cad2b460228f732aa67f52ca6c1f86bbb7f94a",
+  "source_interval_sec": [
+    2.0,
+    4.8
+  ],
+  "output_sha256": "b39690c93fc37870316a024f236f21b9874ed6f4b06552ec1432ff9649f1f582",
+  "processing": "48 kHz mono; +35 dB; limiter 0.1, level=false",
+  "qc": {
+    "source_has_dialogue": "not detected from visual reaction and low-level silence metrics; auditory review pending",
+    "output_rms_dbfs": -45.53,
+    "output_peak_dbfs": -27.9
+  }
+}
